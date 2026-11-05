@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RIVET Dataset</title>
+  <meta name="description" content="RIVET: an indoor dataset pairing raw cascaded-radar ADC samples with on-board radar outputs, RealSense D455 RGB-D and IMU, with pseudo-ground-truth trajectories, baselines and a toolkit.">
+  <meta property="og:title" content="RIVET: Indoor Multimodal Dataset Linking Raw Radar Signals and On-Board Outputs">
+  <meta property="og:description" content="Raw AWR2243 cascade ADC + on-board radar outputs + RGB-D + IMU along 14 indoor routes with glass, mirror-like surfaces, stairs and pedestrians.">
+  <meta property="og:image" content="assets/fig_modalities.png">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="brand" href="#top">RIVET</a>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#sequences">Sequences</a></li>
+      <li><a href="#glass">Glass scenes</a></li>
+      <li><a href="#benchmarks">Benchmarks</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#toolkit">Toolkit</a></li>
+      <li><a href="#release">Release</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero wrap" id="top">
+  <p class="kicker">Indoor radar · RGB-D · IMU dataset</p>
+  <h1>RIVET</h1>
+  <p class="subtitle">Indoor Multimodal Dataset Linking Raw Radar Signals and On-Board Outputs for Mobile Spatial Perception</p>
+  <div class="meta">
+    <p class="authors">Anonymous authors</p>
+    <p class="venue">Under double-blind review</p>
+  </div>
+  <div class="buttons">
+    <span class="btn soon" aria-disabled="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+      Paper <small>(after review)</small></span>
+    <span class="btn soon" aria-disabled="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+      Dataset <small>(after review)</small></span>
+    <span class="btn soon" aria-disabled="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg>
+      Toolkit <small>(after review)</small></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <figure class="teaser">
+    <a class="zoom" href="assets/fig_modalities.png"><img src="assets/fig_modalities.png" width="1704" height="1230"
+         alt="Three indoor scenes, each shown as a color image, a depth image with missing regions, and a radar range-Doppler map."></a>
+    <figcaption>
+      <b>One frame, three sensors, three buildings.</b>
+      Left to right: a lobby with pedestrians (EE-1F), a library reading room (LIB-1F-a) and a glass-roofed bridge (HANA-long).
+      Top: color image (people blurred). Middle: D455 depth, 0–8 m (grey = no depth).
+      Bottom: radar range–Doppler map from the raw ADC, in dB above the noise floor of the two empty DDMA bands
+      (x: range in m, y: radial velocity in m/s).
+    </figcaption>
+  </figure>
+</div>
+
+<section id="overview" class="alt">
+  <div class="wrap">
+    <ul class="stats" aria-label="Dataset at a glance">
+      <li><span class="num">14</span><span class="lab">sequences in 3 buildings</span></li>
+      <li><span class="num">2.49 km</span><span class="lab">hand-held trajectory</span></li>
+      <li><span class="num">45.6 min</span><span class="lab">of radar recording</span></li>
+      <li><span class="num">54,715</span><span class="lab">raw ADC radar frames</span></li>
+      <li><span class="num">82,741</span><span class="lab">RGB-D frames</span></li>
+      <li><span class="num">31</span><span class="lab">baseline configurations</span></li>
+    </ul>
+
+    <h2 style="margin-top:40px">Abstract</h2>
+    <p class="lead">
+      Glass and mirrors in indoor environments can compromise RGB-D measurements, motivating complementary sensing modalities for scene understanding.
+      To support research on radar-based multimodal sensing in these environments, we introduce RIVET (radar, inertial, and visual observations with evaluation tools),
+      an indoor dataset that pairs raw analog-to-digital converter (ADC) samples with on-board radar outputs from the same chirps,
+      enabling direct comparisons between offline and on-board processing.
+      Our hand-held acquisition platform integrates a two-chip AWR2243 cascade operating with Doppler-division multiple access (DDMA),
+      an Intel RealSense D455 RGB-D camera, and an inertial measurement unit.
+      We collected radar measurements, color and depth images, and inertial measurements along continuous routes through corridors, rooms, lobbies, and stairwells across multiple floors.
+      These recordings encompass transparent and reflective surfaces as well as pedestrian activity,
+      supporting investigations of complementary radar and visual observations in indoor scenes.
+      To support empirical evaluation, we provide pseudo-ground-truth references and baseline experiments for simultaneous localization and mapping (SLAM), odometry, and 3D reconstruction.
+      The companion toolkit, RIVET-tools, supports data loading, radar processing, cross-modal projection, visualization, and evaluation.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Raw signals and on-board outputs, paired</h3>
+        <p>Raw cascaded-radar ADC samples and the board's own detections and profiles from the same chirps,
+           recorded with RGB-D and IMU along routes with glass, mirror-like surfaces, stairs and pedestrians.</p>
+      </div>
+      <div class="card">
+        <h3>A reusable toolkit</h3>
+        <p>One sequence interface for DDMA decoding, radar representations, time association, geometric projection,
+           visualization and export, keeping the acquisition metadata and processing conventions.</p>
+      </div>
+      <div class="card">
+        <h3>References and baselines</h3>
+        <p>Pseudo-ground-truth trajectories, scene indicators and 31 baseline configurations for camera motion,
+           radar motion and 3D reconstruction, with coverage, alignment and scale reported explicitly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="platform">
+  <div class="wrap">
+    <h2>Sensor platform</h2>
+    <div class="platform">
+      <figure class="photo">
+        <img src="assets/rig_photo.jpg" width="900" height="1078" loading="lazy"
+             alt="Hand-held rig: an Intel RealSense D455 camera mounted above a red TI AWR2243 two-chip cascade radar board.">
+        <figcaption>The hand-held rig: RealSense D455 above the AWR2243 two-chip cascade; a DCA1000 captures the ADC stream over Ethernet.</figcaption>
+      </figure>
+      <div>
+        <div class="table-wrap">
+          <table class="spec">
+            <tbody>
+              <tr><th>Radar</th><td>TI AWR2243 two-chip cascade, 6 Tx × 8 Rx, Doppler-division multiple access (DDMA), 77 GHz</td></tr>
+              <tr><th>Raw ADC</th><td>256 chirps × 8 Rx × 192 samples (complex) per frame, 20 Hz</td></tr>
+              <tr><th>Chirp</th><td>5 MS/s, 44.41 MHz/µs, 5 µs idle + 45 µs ramp</td></tr>
+              <tr><th>Range</th><td>0.0879 m per bin, 16.9 m sampled span</td></tr>
+              <tr><th>Doppler</th><td>0.152 m/s per bin, 32 bins (±2.4 m/s) per DDMA band</td></tr>
+              <tr><th>On-board outputs</th><td>Detected points (x, y, z, radial velocity), range and noise profiles, DSP statistics, raw UART packets, from the same chirps as the raw ADC</td></tr>
+              <tr><th>RGB-D</th><td>Intel RealSense D455, 640 × 480 color and depth, 30 Hz</td></tr>
+              <tr><th>IMU</th><td>D455 accelerometer and gyroscope, 400 Hz</td></tr>
+              <tr><th>Calibration</th><td>Factory camera intrinsics and extrinsics; radar-to-camera extrinsics from the mount drawing (±3–5 mm), radar boresight parallel to the camera optical axis</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:16px">
+          Every stream keeps its host timestamps, and the camera and IMU also keep the D455 device clock.
+          Raw radar frames are timed from the radar start event; on-board frames are de-jittered with a fit to the board's frame counter.
+        </p>
+      </div>
+    </div>
+
+    <figure>
+      <a class="zoom" href="assets/fig_timeline.png"><img src="assets/fig_timeline.png" width="1492" height="350" loading="lazy"
+           alt="A one-second timeline of sample times: raw radar, on-board frames by counter fit and by arrival, camera frames, and IMU samples."></a>
+      <figcaption>
+        <b>Sampling timeline (one second of EE-508).</b>
+        Raw radar and on-board products follow the 20 Hz radar frame schedule; the camera and IMU run at 30 and 400 Hz.
+        On-board frames reach the host over a serial link with jitter (red); the toolkit uses their frame-counter fit instead.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="sequences" class="alt">
+  <div class="wrap">
+    <h2>Sequences</h2>
+    <p>Fourteen continuous hand-held routes through corridors, rooms, lobbies and stairwells of three campus buildings.</p>
+    <div class="table-wrap">
+      <table class="seq">
+        <thead>
+          <tr>
+            <th>Sequence</th><th>Building</th><th class="n">Radar (s)</th><th class="n">Raw frames</th>
+            <th class="n">RGB-D frames</th><th class="n">Path (m)</th><th>Route</th><th class="n">Size (GB)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>EE-508</td><td><span class="bld ee">EE</span></td><td class="n">62.3</td><td class="n">1,245</td><td class="n">1,858</td><td class="n">29.4</td><td>Office room</td><td class="n">3.1</td></tr>
+          <tr><td>EE-250</td><td><span class="bld ee">EE</span></td><td class="n">74.3</td><td class="n">1,486</td><td class="n">2,188</td><td class="n">34.2</td><td>Room</td><td class="n">3.6</td></tr>
+          <tr><td>EE-3F</td><td><span class="bld ee">EE</span></td><td class="n">52.0</td><td class="n">1,040</td><td class="n">3,760</td><td class="n">93.2</td><td>Corridor loop</td><td class="n">3.9</td></tr>
+          <tr><td>EE-2F</td><td><span class="bld ee">EE</span></td><td class="n">100.9</td><td class="n">2,018</td><td class="n">2,959</td><td class="n">82.0</td><td>Corridor loop</td><td class="n">4.9</td></tr>
+          <tr><td>EE-1F</td><td><span class="bld ee">EE</span></td><td class="n">60.6</td><td class="n">1,211</td><td class="n">1,798</td><td class="n">48.8</td><td>Lobby, glass, pedestrians</td><td class="n">3.0</td></tr>
+          <tr><td>EE-stair-A</td><td><span class="bld ee">EE</span></td><td class="n">71.6</td><td class="n">1,432</td><td class="n">2,096</td><td class="n">47.1</td><td>Stairs and elevator lobby</td><td class="n">3.5</td></tr>
+          <tr><td>EE-stair-B</td><td><span class="bld ee">EE</span></td><td class="n">124.7</td><td class="n">2,494</td><td class="n">3,666</td><td class="n">116.5</td><td>Lobby and corridors, out and back</td><td class="n">6.0</td></tr>
+          <tr><td>EE-stair-C</td><td><span class="bld ee">EE</span></td><td class="n">178.8</td><td class="n">3,575</td><td class="n">5,224</td><td class="n">168.0</td><td>Lobby and corridors, out and back</td><td class="n">8.6</td></tr>
+          <tr><td>EE-5F</td><td><span class="bld ee">EE</span></td><td class="n">225.2</td><td class="n">4,504</td><td class="n">6,573</td><td class="n">200.6</td><td>Floor traversal along a glass facade</td><td class="n">11</td></tr>
+          <tr><td>EE-5F-long</td><td><span class="bld ee">EE</span></td><td class="n">295.7</td><td class="n">5,914</td><td class="n">8,723</td><td class="n">279.6</td><td>Extended traversal across floors</td><td class="n">15</td></tr>
+          <tr><td>EE-stair-long</td><td><span class="bld ee">EE</span></td><td class="n">104.3</td><td class="n">2,085</td><td class="n">3,081</td><td class="n">76.0</td><td>Stairwell traversal</td><td class="n">5.1</td></tr>
+          <tr><td>LIB-1F-a</td><td><span class="bld lib">Library</span></td><td class="n">539.5</td><td class="n">10,789</td><td class="n">15,876</td><td class="n">538.0</td><td>Library loop</td><td class="n">27</td></tr>
+          <tr><td>LIB-1F-b</td><td><span class="bld lib">Library</span></td><td class="n">524.3</td><td class="n">10,486</td><td class="n">15,401</td><td class="n">494.4</td><td>Library to a glass-roofed corridor</td><td class="n">26</td></tr>
+          <tr><td>HANA-long</td><td><span class="bld hana">HANA</span></td><td class="n">321.8</td><td class="n">6,436</td><td class="n">9,538</td><td class="n">277.4</td><td>Closed loop from a glass-roofed bridge</td><td class="n">16</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Total</td><td>3 buildings</td><td class="n">2,736</td><td class="n">54,715</td><td class="n">82,741</td><td class="n">2,485</td><td></td><td class="n">≈ 133</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <figure class="narrow">
+      <a class="zoom" href="assets/fig_reference_trajectories.png"><img src="assets/fig_reference_trajectories.png" width="754" height="882" loading="lazy"
+           alt="Fourteen top views of the reference trajectories with start points, scale bars and a shared height color scale."></a>
+      <figcaption><b>Pseudo-ground-truth trajectories</b>, top view, colored by height above the start (black dot = start).</figcaption>
+    </figure>
+
+    <h3>Scenes</h3>
+    <p>Pedestrians, glass facades and partitions, mirror-like stone, a glass-roofed bridge, stairwells and textureless corridors.
+       The share of valid D455 depth pixels in the same frame is given under each image. People are blurred.</p>
+    <div class="gallery">
+      <figure><img src="assets/gallery/EE-1F_00600.jpg" width="640" height="480" loading="lazy" alt="Lobby with walking pedestrians (blurred)."><figcaption><b>EE-1F</b> · lobby, pedestrians · depth 92&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/HANA-long_02400.jpg" width="640" height="480" loading="lazy" alt="Corridor with a group of pedestrians walking towards the camera (blurred)."><figcaption><b>HANA-long</b> · group of pedestrians · depth 90&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/LIB-1F-a_00600.jpg" width="640" height="480" loading="lazy" alt="Library reading room with study carrels."><figcaption><b>LIB-1F-a</b> · reading room · depth 85&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/HANA-long_03600.jpg" width="640" height="480" loading="lazy" alt="Arcade with glass shop fronts and a polished floor."><figcaption><b>HANA-long</b> · arcade, glass shop fronts · depth 88&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/EE-stair-B_00900.jpg" width="640" height="480" loading="lazy" alt="Lobby with a tall glass facade and low sun."><figcaption><b>EE-stair-B</b> · glass facade, low sun · depth 86&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/EE-3F_01200.jpg" width="640" height="480" loading="lazy" alt="Open floor with a glass-walled office."><figcaption><b>EE-3F</b> · glass-walled office · depth 90&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/EE-2F_00900.jpg" width="640" height="480" loading="lazy" alt="Corridor with a glass partition and reflections."><figcaption><b>EE-2F</b> · glass partition, reflections · depth 93&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/LIB-1F-a_11700.jpg" width="640" height="480" loading="lazy" alt="Stairwell lined with black polished stone that reflects like a mirror."><figcaption><b>LIB-1F-a</b> · polished stone, mirror-like · depth 85&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/HANA-long_09000.jpg" width="640" height="480" loading="lazy" alt="Bridge with a glass roof and glass balustrades."><figcaption><b>HANA-long</b> · glass-roofed bridge · depth 83&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/EE-stair-A_01800.jpg" width="640" height="480" loading="lazy" alt="Staircase with glass balustrades."><figcaption><b>EE-stair-A</b> · stairs, glass balustrade · depth 84&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/EE-5F_05400.jpg" width="640" height="480" loading="lazy" alt="Long white corridor with glare at the end."><figcaption><b>EE-5F</b> · textureless corridor, glare · depth 95&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/EE-stair-B_03300.jpg" width="640" height="480" loading="lazy" alt="Elevator lobby with steel doors."><figcaption><b>EE-stair-B</b> · elevator lobby, steel doors · depth 92&nbsp;%</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="glass">
+  <div class="wrap">
+    <h2>Radar where depth sees through glass</h2>
+    <p>At glass doors and balustrades the D455 measures the hall behind the pane or returns no depth,
+       while the radar returns from the glass plane itself. Raw range profiles and on-board detections are recorded side by side.</p>
+    <figure>
+      <a class="zoom" href="assets/fig_depth_fail_radar.png"><img src="assets/fig_depth_fail_radar.png" width="1748" height="1472" loading="lazy"
+           alt="Three glass scenes, each with a color image and radar detections, the depth image with missing regions, and a radar top view comparing radar and depth."></a>
+      <figcaption>
+        <b>Glass doors and balustrades in three sequences.</b>
+        Left: color with on-board radar detections (red circles). Middle: D455 depth (light red = no depth).
+        Right: top view in the radar frame — depth points at sensor height (black), on-board detections (red),
+        and the five strongest raw range-profile peaks (blue arcs; azimuth not resolved).
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="benchmarks" class="alt">
+  <div class="wrap">
+    <h2>Benchmarks</h2>
+    <p>We run 31 baseline configurations against the pseudo-ground-truth: camera SLAM, VIO and odometry, radar odometry on
+       raw-ADC and on-board inputs, and feed-forward 3D reconstruction. Coverage, alignment and scale are reported for every run.</p>
+    <div class="two-col">
+      <figure class="narrow" style="margin:0">
+        <a class="zoom" href="assets/fig_benchmark_summary.png"><img src="assets/fig_benchmark_summary.png" width="743" height="838" loading="lazy"
+             alt="Bar charts of absolute trajectory error and one-second relative translation error for camera and radar methods."></a>
+      </figure>
+      <div>
+        <h3 style="margin-top:0">Camera and radar motion over all 14 sequences</h3>
+        <p><b>Top:</b> ATE after SE(3) alignment on the metric runs (coverage ≥ 0.8 and Sim(3) scale 0.8–1.25);
+           bar = mean, line = min–max.</p>
+        <p><b>Bottom:</b> translation RPE over 1 s; bar = median over the 14 sequences, line = min–max (log scale).</p>
+        <p>Camera methods in blue, radar methods in red. Radar methods run on both the raw ADC
+           (<code>raw</code>) and the board's own detections (<code>board</code>).</p>
+      </div>
+    </div>
+    <figure>
+      <a class="zoom" href="assets/fig_recon3d_gallery.png"><img src="assets/fig_recon3d_gallery.png" width="1756" height="446" loading="lazy"
+           alt="Top views of the EE-508 room: depth reference and four image-based reconstructions, colored by height."></a>
+      <figcaption><b>3D reconstruction of the EE-508 room</b> after alignment: the depth-integrated reference and four
+        image-based methods, top view colored by height.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="data">
+  <div class="wrap">
+    <h2>Data</h2>
+    <p class="note">The dataset will be released on Hugging Face after the review process, as one archive per sequence.</p>
+    <h3>Layout of one sequence</h3>
+<pre><code>&lt;sequence&gt;/
+├── mmwave/
+│   ├── raw/            adc.bin  format.json  frames.csv   <span class="cm"># raw ADC, int16 I/Q, 1,572,864 B per frame</span>
+│   ├── pointcloud/     points.csv  frames.csv             <span class="cm"># on-board detections</span>
+│   ├── range_profile/  range_profile.npy  noise_profile.npy  frames.csv
+│   ├── stats/          frames.csv                         <span class="cm"># on-board DSP timing, CPU load, temperature</span>
+│   ├── tlv/            packets.dat                        <span class="cm"># raw UART packets from the board</span>
+│   └── radar_cfg.txt                                      <span class="cm"># chirp configuration sent to the board</span>
+├── rgb/                000000.jpg …                       <span class="cm"># 640×480 color</span>
+├── depth/              000000.npy …                       <span class="cm"># 640×480 uint16, millimetres</span>
+├── imu/                accel.csv  gyro.csv
+├── meta/               session.json  events.csv  alignment.csv
+├── intrinsic.txt
+└── extrinsic.txt</code></pre>
+    <p>Conventions: radar frame x right, y forward, z up; camera frame x right, y down, z forward.
+       <code>extrinsic.txt</code> blocks <code>[A_to_B]</code> give <code>p_B = R p_A + t</code>.
+       Pseudo-ground-truth trajectories are provided in TUM format (<code>t x y z qx qy qz qw</code>).</p>
+    <p>The loader applies three corrections when a sequence is opened: raw frame times are taken from the radar start event
+       (mid-frame), on-board radial velocities are rescaled to the recorded 0.152 m/s Doppler bin, and on-board frame times
+       are de-jittered with the frame counter. Read the files through the toolkit, or apply the same corrections yourself.</p>
+  </div>
+</section>
+
+<section id="toolkit" class="alt">
+  <div class="wrap">
+    <h2>Toolkit</h2>
+    <p>RIVET-tools loads a sequence, decodes DDMA, projects radar points into the images and runs the evaluation.
+       It is released together with the dataset; the examples below show the interface.</p>
+<pre><code>pip install -e .            <span class="cm"># core: numpy, scipy, opencv</span>
+pip install -e .[viz,bench] <span class="cm"># + matplotlib, open3d, pandas</span></code></pre>
+<pre><code>from mv3rkit import Sequence
+from mv3rkit.radar import dsp
+from mv3rkit.geometry import radar_to_pixels
+
+seq = Sequence("RIVET/EE-250")
+print(seq.summary())
+
+cube = seq.radar.adc(100, 102)          <span class="cm"># (2, 256 chirps, 8 rx, 192 samples) complex64, DDMA-coded</span>
+d = dsp.ddma_demodulate(cube)           <span class="cm"># d["tx"]: (2, 6 tx, 32 doppler, 8 rx, 192 range)</span>
+
+i = 500
+rgb, depth = seq.rgb(i), seq.depth(i)   <span class="cm"># uint8 RGB, float32 metres</span>
+pc = seq.pointcloud.frame(seq.nearest_pc_frame(i), ("x", "y", "z", "v", "range"))
+uv, z, inside = radar_to_pixels(pc[:, :3], seq.calib, "color")</code></pre>
+<pre><code>mv3r info  RIVET/                         <span class="cm"># table of all sequences</span>
+mv3r check RIVET/ --deep                  <span class="cm"># integrity: sizes, counts, first raw frame</span>
+mv3r viz   RIVET/EE-250 --frame 1200 --out panel.png
+mv3r export RIVET/EE-250 tum out/tum/EE-250</code></pre>
+  </div>
+</section>
+
+<section id="release">
+  <div class="wrap">
+    <h2>Release</h2>
+    <p>The paper is under double-blind review. The dataset, RIVET-tools, the citation and the licenses will be published
+       on this page after the review process.</p>
+    <p>People appearing in the color images are blurred on this page and in the released data.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    RIVET dataset project page.
+  </div>
+</footer>
+
+</body>
+</html>
