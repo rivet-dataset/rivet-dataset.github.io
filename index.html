@@ -4,10 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RIVET Dataset</title>
-  <meta name="description" content="RIVET: an indoor dataset pairing raw cascaded-radar ADC samples with on-board radar outputs, RealSense D455 RGB-D and IMU, with pseudo-ground-truth trajectories, baselines and a toolkit.">
-  <meta property="og:title" content="RIVET: Indoor Multimodal Dataset Linking Raw Radar Signals and On-Board Outputs">
-  <meta property="og:description" content="Raw AWR2243 cascade ADC + on-board radar outputs + RGB-D + IMU along 14 indoor routes with glass, mirror-like surfaces, stairs and pedestrians.">
-  <meta property="og:image" content="assets/fig_modalities.png">
+  <meta name="description" content="RIVET: an indoor dataset pairing raw cascaded-radar signals and on-board outputs from the same acquisition with RGB-D and inertial observations, around transparent surfaces, with pseudo-ground-truth trajectories, 31 baselines and a toolkit.">
+  <meta property="og:title" content="RIVET: Indoor Multimodal Dataset Pairing Raw Radar Signals and On-Board Outputs around Transparent Surfaces">
+  <meta property="og:description" content="14 hand-held indoor sequences in three buildings: raw AWR2243 cascade ADC and on-board radar outputs from the same acquisition, RGB-D and IMU, along routes with glass, reflective surfaces, pedestrians and stairs.">
+  <meta property="og:url" content="https://rivet-dataset.github.io/">
+  <meta property="og:image" content="https://rivet-dataset.github.io/assets/fig_environment.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +25,7 @@
       <li><a href="#overview">Overview</a></li>
       <li><a href="#platform">Platform</a></li>
       <li><a href="#sequences">Sequences</a></li>
-      <li><a href="#glass">Glass scenes</a></li>
+      <li><a href="#glass">Glass</a></li>
       <li><a href="#benchmarks">Benchmarks</a></li>
       <li><a href="#data">Data</a></li>
       <li><a href="#toolkit">Toolkit</a></li>
@@ -35,7 +37,7 @@
 <header class="hero wrap" id="top">
   <p class="kicker">Indoor radar · RGB-D · IMU dataset</p>
   <h1>RIVET</h1>
-  <p class="subtitle">Indoor Multimodal Dataset Linking Raw Radar Signals and On-Board Outputs for Mobile Spatial Perception</p>
+  <p class="subtitle">Indoor Multimodal Dataset Pairing Raw Radar Signals and On-Board Outputs around Transparent Surfaces</p>
   <div class="meta">
     <p class="authors">Anonymous authors</p>
     <p class="venue">Under double-blind review</p>
@@ -55,14 +57,12 @@
 
 <div class="wrap">
   <figure class="teaser">
-    <a class="zoom" href="assets/fig_modalities.png"><img src="assets/fig_modalities.png" width="1704" height="1230"
-         alt="Three indoor scenes, each shown as a color image, a depth image with missing regions, and a radar range-Doppler map."></a>
+    <img src="assets/fig_environment.jpg" width="1600" height="1363"
+         alt="An RGB-D camera and an mmWave radar face a glass pane with a box behind it. The camera finds no features on the glass, so its depth describes the background; the radar receives a return from the glass interface and from the box.">
     <figcaption>
-      <b>One frame, three sensors, three buildings.</b>
-      Left to right: a lobby with pedestrians (EE-1F), a library reading room (LIB-1F-a) and a glass-roofed bridge (HANA-long).
-      Top: color image (people blurred). Middle: D455 depth, 0–8 m (grey = no depth).
-      Bottom: radar range–Doppler map from the raw ADC, in dB above the noise floor of the two empty DDMA bands
-      (x: range in m, y: radial velocity in m/s).
+      <b>Optical and radar observations of transparent glass.</b>
+      RGB-D observations may describe the visible background rather than the glass surface,
+      while radar can capture returns from both the glass interface and background objects.
     </figcaption>
   </figure>
 </div>
@@ -71,45 +71,55 @@
   <div class="wrap">
     <ul class="stats" aria-label="Dataset at a glance">
       <li><span class="num">14</span><span class="lab">sequences in 3 buildings</span></li>
-      <li><span class="num">2.49 km</span><span class="lab">hand-held trajectory</span></li>
-      <li><span class="num">45.6 min</span><span class="lab">of radar recording</span></li>
+      <li><span class="num">2.49 km</span><span class="lab">reference-derived routes</span></li>
       <li><span class="num">54,715</span><span class="lab">raw ADC radar frames</span></li>
-      <li><span class="num">82,741</span><span class="lab">RGB-D frames</span></li>
+      <li><span class="num">1.30 M</span><span class="lab">on-board radar detections</span></li>
+      <li><span class="num">82,741</span><span class="lab">color–depth frame pairs</span></li>
       <li><span class="num">31</span><span class="lab">baseline configurations</span></li>
     </ul>
 
     <h2 style="margin-top:40px">Abstract</h2>
     <p class="lead">
-      Glass and mirrors in indoor environments can compromise RGB-D measurements, motivating complementary sensing modalities for scene understanding.
-      To support research on radar-based multimodal sensing in these environments, we introduce RIVET (radar, inertial, and visual observations with evaluation tools),
-      an indoor dataset that pairs raw analog-to-digital converter (ADC) samples with on-board radar outputs from the same chirps,
-      enabling direct comparisons between offline and on-board processing.
-      Our hand-held acquisition platform integrates a two-chip AWR2243 cascade operating with Doppler-division multiple access (DDMA),
-      an Intel RealSense D455 RGB-D camera, and an inertial measurement unit.
-      We collected radar measurements, color and depth images, and inertial measurements along continuous routes through corridors, rooms, lobbies, and stairwells across multiple floors.
-      These recordings encompass transparent and reflective surfaces as well as pedestrian activity,
-      supporting investigations of complementary radar and visual observations in indoor scenes.
-      To support empirical evaluation, we provide pseudo-ground-truth references and baseline experiments for simultaneous localization and mapping (SLAM), odometry, and 3D reconstruction.
-      The companion toolkit, RIVET-tools, supports data loading, radar processing, cross-modal projection, visualization, and evaluation.
+      Transparent glass can cause RGB-D measurements to describe backgrounds rather than physical barriers,
+      motivating complementary radar sensing for indoor navigation and mapping.
+      To support the development and evaluation of such multimodal approaches, we introduce RIVET,
+      an indoor dataset pairing raw cascaded-radar signals and on-board outputs from the same acquisition with RGB-D and inertial observations.
+      The collection contains 14 sequences across three buildings, spanning approximately 2.49&nbsp;km of reference-derived routes
+      and 82,741 color–depth frame pairs.
+      The routes include transparent and reflective surfaces, pedestrian activity, open paths, revisits, and multi-floor motion.
+      We provide RIVET-tools for processing and evaluation, pseudo-ground-truth trajectories, and 31 baseline configurations
+      covering camera and radar motion estimation and image-based 3D reconstruction.
+      The evaluated Doppler–inertial processing paths yield aggregate one-second translation relative pose errors of 0.13&nbsp;m
+      with raw-derived input and 0.77&nbsp;m with on-board input, highlighting processing-dependent differences within paired recordings.
     </p>
 
     <div class="cards">
       <div class="card">
-        <h3>Raw signals and on-board outputs, paired</h3>
-        <p>Raw cascaded-radar ADC samples and the board's own detections and profiles from the same chirps,
-           recorded with RGB-D and IMU along routes with glass, mirror-like surfaces, stairs and pedestrians.</p>
+        <h3>Continuous indoor routes with transparent surfaces and human activity</h3>
+        <p>Three buildings with glass-lined corridors, reflective surfaces, pedestrian activity and stair traversals,
+           extended routes and varied platform motion. Sequence-level scene and motion indicators support selecting
+           recordings for targeted evaluation.</p>
       </div>
       <div class="card">
-        <h3>A reusable toolkit</h3>
-        <p>One sequence interface for DDMA decoding, radar representations, time association, geometric projection,
-           visualization and export, keeping the acquisition metadata and processing conventions.</p>
+        <h3>Raw radar signals and on-board outputs, linked</h3>
+        <p>14 sequences over 2.49&nbsp;km of reference-derived routes, pairing raw cascaded-radar ADC samples and recorded
+           on-board products from the same acquisition with RGB-D and inertial observations.</p>
       </div>
       <div class="card">
-        <h3>References and baselines</h3>
-        <p>Pseudo-ground-truth trajectories, scene indicators and 31 baseline configurations for camera motion,
-           radar motion and 3D reconstruction, with coverage, alignment and scale reported explicitly.</p>
+        <h3>A reusable processing and evaluation toolkit</h3>
+        <p>One sequence interface for DDMA decoding, radar representations, temporal association, geometric projection,
+           visualization and export, with pseudo-ground-truth trajectories and 31 baseline configurations;
+           coverage, alignment and scale are reported explicitly.</p>
       </div>
     </div>
+
+    <figure class="narrow">
+      <img src="assets/fig_usages.jpg" width="1600" height="1133" loading="lazy"
+           alt="The RGB-D camera produces color and depth images that feed visual SLAM, 3D reconstruction and odometry; the mmWave radar produces Doppler data that feed radar SLAM and object detection; both branches feed fusion algorithms.">
+      <figcaption><b>Research uses</b> across visual geometry, radar perception and multimodal fusion.
+        The benchmarks cover camera and radar motion estimation and image-based 3D reconstruction;
+        fusion and object detection are further uses.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -119,31 +129,53 @@
     <div class="platform">
       <figure class="photo">
         <img src="assets/rig_photo.jpg" width="900" height="1078" loading="lazy"
-             alt="Hand-held rig: an Intel RealSense D455 camera mounted above a red TI AWR2243 two-chip cascade radar board.">
-        <figcaption>The hand-held rig: RealSense D455 above the AWR2243 two-chip cascade; a DCA1000 captures the ADC stream over Ethernet.</figcaption>
+             alt="Hand-held rig: an Intel RealSense D455 camera mounted above a red TI AWR2243 two-chip cascade radar board, with a DCA1000 capture board behind.">
+        <figcaption>The hand-held rig: RealSense D455 above the two-chip AWR2243 cascade; a DCA1000 captures the ADC stream over Ethernet.</figcaption>
       </figure>
       <div>
         <div class="table-wrap">
           <table class="spec">
             <tbody>
-              <tr><th>Radar</th><td>TI AWR2243 two-chip cascade, 6 Tx × 8 Rx, Doppler-division multiple access (DDMA), 77 GHz</td></tr>
-              <tr><th>Raw ADC</th><td>256 chirps × 8 Rx × 192 samples (complex) per frame, 20 Hz</td></tr>
-              <tr><th>Chirp</th><td>5 MS/s, 44.41 MHz/µs, 5 µs idle + 45 µs ramp</td></tr>
-              <tr><th>Range</th><td>0.0879 m per bin, 16.9 m sampled span</td></tr>
-              <tr><th>Doppler</th><td>0.152 m/s per bin, 32 bins (±2.4 m/s) per DDMA band</td></tr>
-              <tr><th>On-board outputs</th><td>Detected points (x, y, z, radial velocity), range and noise profiles, DSP statistics, raw UART packets, from the same chirps as the raw ADC</td></tr>
-              <tr><th>RGB-D</th><td>Intel RealSense D455, 640 × 480 color and depth, 30 Hz</td></tr>
-              <tr><th>IMU</th><td>D455 accelerometer and gyroscope, 400 Hz</td></tr>
-              <tr><th>Calibration</th><td>Factory camera intrinsics and extrinsics; radar-to-camera extrinsics from the mount drawing (±3–5 mm), radar boresight parallel to the camera optical axis</td></tr>
+              <tr><th>Radar</th><td>Two AWR2243 devices in cascade, 6 Tx, 8 Rx, Doppler-division multiple access (DDMA)</td></tr>
+              <tr><th>Raw frame</th><td>256 chirps × 8 Rx × 192 complex samples, 20 Hz; 1,572,864 bytes per frame</td></tr>
+              <tr><th>Fast-time sampling</th><td>5 MS/s, 192 samples, 44.41 MHz/µs</td></tr>
+              <tr><th>Chirp timing</th><td>5 µs idle, 45 µs ramp, 256 chirps</td></tr>
+              <tr><th>Range sampling</th><td>0.0879 m per bin, 16.9 m sampled span</td></tr>
+              <tr><th>Doppler sampling</th><td>0.152 m/s per bin, 32 bins (±2.4 m/s) per DDMA band</td></tr>
+              <tr><th>On-board products</th><td>Detections (x, y, z, radial velocity, range, azimuth, elevation), 192-bin range profiles,
+                processing statistics and the original type–length–value packets, from the same acquisition as the raw ADC</td></tr>
+              <tr><th>Color / depth</th><td>Intel RealSense D455, 640 × 480, nominal 30 Hz, native depth grid</td></tr>
+              <tr><th>IMU</th><td>Accelerometer and gyroscope, nominal 400 Hz</td></tr>
+              <tr><th>Extrinsics</th><td>Mechanical radar mount, factory camera calibration</td></tr>
             </tbody>
           </table>
         </div>
         <p style="margin-top:16px">
-          Every stream keeps its host timestamps, and the camera and IMU also keep the D455 device clock.
-          Raw radar frames are timed from the radar start event; on-board frames are de-jittered with a fit to the board's frame counter.
+          Rates are nominal; actual frame and sample times remain in the sequence metadata.
+          The platform records 48 transmitter–receiver combinations. The evaluated raw front end uses a coherent
+          four-receiver sub-array for coarse azimuth, and the full recordings and device calibration commands remain
+          available for alternative array processing.
+        </p>
+        <p>
+          All streams keep host-side time records, and the camera and IMU also keep device timestamps; no shared hardware
+          trigger is assumed. The loader places raw frame <i>k</i> at <i>t</i><sub>sensor</sub> + 0.05<i>k</i> + 0.025&nbsp;s
+          from the radar sensor start, fits on-board frames to the board's frame counter to remove serial-arrival jitter,
+          and the visual-inertial adapter applies the camera–IMU device-time offset.
         </p>
       </div>
     </div>
+
+    <figure>
+      <a class="zoom" href="assets/fig_modalities.png"><img src="assets/fig_modalities.png" width="1704" height="1230" loading="lazy"
+         alt="Three indoor scenes, each shown as a color image, a depth image with missing regions, and a radar range-Doppler map."></a>
+      <figcaption>
+        <b>One frame from each building.</b>
+        Left to right: a lobby with pedestrians (EE-1F), a library reading room (LIB-1F-a) and a glass-roofed bridge (HANA-long).
+        Top: color image (people blurred). Middle: D455 depth, 0–8 m (grey = no depth).
+        Bottom: radar range–Doppler map from the raw ADC, in dB above the noise floor of the two empty DDMA bands
+        (x: range in m, y: radial velocity in m/s).
+      </figcaption>
+    </figure>
 
     <figure>
       <a class="zoom" href="assets/fig_timeline.png"><img src="assets/fig_timeline.png" width="1492" height="350" loading="lazy"
@@ -160,46 +192,74 @@
 <section id="sequences" class="alt">
   <div class="wrap">
     <h2>Sequences</h2>
-    <p>Fourteen continuous hand-held routes through corridors, rooms, lobbies and stairwells of three campus buildings.</p>
+    <p>Fourteen sequences recorded with free hand-held motion at walking speed in three buildings: 54,715 raw radar frames,
+       82,741 color–depth frame pairs, 2.22 million inertial records and 1.30 million on-board radar detections.
+       Uncompressed ADC storage totals 86.1&nbsp;GB. The reference-derived paths total 2,485&nbsp;m, the longest route 538&nbsp;m.</p>
     <div class="table-wrap">
       <table class="seq">
         <thead>
           <tr>
             <th>Sequence</th><th>Building</th><th class="n">Radar (s)</th><th class="n">Raw frames</th>
-            <th class="n">RGB-D frames</th><th class="n">Path (m)</th><th>Route</th><th class="n">Size (GB)</th>
+            <th class="n">RGB-D frames</th><th class="n">Path (m)</th><th>Route type</th><th class="n">Size (GB)</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>EE-508</td><td><span class="bld ee">EE</span></td><td class="n">62.3</td><td class="n">1,245</td><td class="n">1,858</td><td class="n">29.4</td><td>Office room</td><td class="n">3.1</td></tr>
-          <tr><td>EE-250</td><td><span class="bld ee">EE</span></td><td class="n">74.3</td><td class="n">1,486</td><td class="n">2,188</td><td class="n">34.2</td><td>Room</td><td class="n">3.6</td></tr>
-          <tr><td>EE-3F</td><td><span class="bld ee">EE</span></td><td class="n">52.0</td><td class="n">1,040</td><td class="n">3,760</td><td class="n">93.2</td><td>Corridor loop</td><td class="n">3.9</td></tr>
-          <tr><td>EE-2F</td><td><span class="bld ee">EE</span></td><td class="n">100.9</td><td class="n">2,018</td><td class="n">2,959</td><td class="n">82.0</td><td>Corridor loop</td><td class="n">4.9</td></tr>
-          <tr><td>EE-1F</td><td><span class="bld ee">EE</span></td><td class="n">60.6</td><td class="n">1,211</td><td class="n">1,798</td><td class="n">48.8</td><td>Lobby, glass, pedestrians</td><td class="n">3.0</td></tr>
-          <tr><td>EE-stair-A</td><td><span class="bld ee">EE</span></td><td class="n">71.6</td><td class="n">1,432</td><td class="n">2,096</td><td class="n">47.1</td><td>Stairs and elevator lobby</td><td class="n">3.5</td></tr>
-          <tr><td>EE-stair-B</td><td><span class="bld ee">EE</span></td><td class="n">124.7</td><td class="n">2,494</td><td class="n">3,666</td><td class="n">116.5</td><td>Lobby and corridors, out and back</td><td class="n">6.0</td></tr>
-          <tr><td>EE-stair-C</td><td><span class="bld ee">EE</span></td><td class="n">178.8</td><td class="n">3,575</td><td class="n">5,224</td><td class="n">168.0</td><td>Lobby and corridors, out and back</td><td class="n">8.6</td></tr>
-          <tr><td>EE-5F</td><td><span class="bld ee">EE</span></td><td class="n">225.2</td><td class="n">4,504</td><td class="n">6,573</td><td class="n">200.6</td><td>Floor traversal along a glass facade</td><td class="n">11</td></tr>
-          <tr><td>EE-5F-long</td><td><span class="bld ee">EE</span></td><td class="n">295.7</td><td class="n">5,914</td><td class="n">8,723</td><td class="n">279.6</td><td>Extended traversal across floors</td><td class="n">15</td></tr>
-          <tr><td>EE-stair-long</td><td><span class="bld ee">EE</span></td><td class="n">104.3</td><td class="n">2,085</td><td class="n">3,081</td><td class="n">76.0</td><td>Stairwell traversal</td><td class="n">5.1</td></tr>
-          <tr><td>LIB-1F-a</td><td><span class="bld lib">Library</span></td><td class="n">539.5</td><td class="n">10,789</td><td class="n">15,876</td><td class="n">538.0</td><td>Library loop</td><td class="n">27</td></tr>
-          <tr><td>LIB-1F-b</td><td><span class="bld lib">Library</span></td><td class="n">524.3</td><td class="n">10,486</td><td class="n">15,401</td><td class="n">494.4</td><td>Library to a glass-roofed corridor</td><td class="n">26</td></tr>
-          <tr><td>HANA-long</td><td><span class="bld hana">HANA</span></td><td class="n">321.8</td><td class="n">6,436</td><td class="n">9,538</td><td class="n">277.4</td><td>Closed loop from a glass-roofed bridge</td><td class="n">16</td></tr>
+          <tr><td>EE-508</td><td><span class="bld ee">EE</span></td><td class="n">62.3</td><td class="n">1,245</td><td class="n">1,858</td><td class="n">29.4</td><td>Room views</td><td class="n">3.1</td></tr>
+          <tr><td>EE-250</td><td><span class="bld ee">EE</span></td><td class="n">74.3</td><td class="n">1,486</td><td class="n">2,188</td><td class="n">34.2</td><td>Room views</td><td class="n">3.6</td></tr>
+          <tr><td>EE-3F</td><td><span class="bld ee">EE</span></td><td class="n">52.0</td><td class="n">1,040</td><td class="n">3,760</td><td class="n">93.2</td><td>Return near start</td><td class="n">3.9</td></tr>
+          <tr><td>EE-2F</td><td><span class="bld ee">EE</span></td><td class="n">100.9</td><td class="n">2,018</td><td class="n">2,959</td><td class="n">82.0</td><td>Return near start</td><td class="n">4.9</td></tr>
+          <tr><td>EE-1F</td><td><span class="bld ee">EE</span></td><td class="n">60.6</td><td class="n">1,211</td><td class="n">1,798</td><td class="n">48.8</td><td>Open lobby, glass</td><td class="n">3.0</td></tr>
+          <tr><td>EE-stair-A</td><td><span class="bld ee">EE</span></td><td class="n">71.6</td><td class="n">1,432</td><td class="n">2,096</td><td class="n">47.1</td><td>Stair ascent</td><td class="n">3.5</td></tr>
+          <tr><td>EE-stair-B</td><td><span class="bld ee">EE</span></td><td class="n">124.7</td><td class="n">2,494</td><td class="n">3,666</td><td class="n">116.5</td><td>Stair retraversal</td><td class="n">6.0</td></tr>
+          <tr><td>EE-stair-C</td><td><span class="bld ee">EE</span></td><td class="n">178.8</td><td class="n">3,575</td><td class="n">5,224</td><td class="n">168.0</td><td>Stair retraversals</td><td class="n">8.6</td></tr>
+          <tr><td>EE-5F</td><td><span class="bld ee">EE</span></td><td class="n">225.2</td><td class="n">4,504</td><td class="n">6,573</td><td class="n">200.6</td><td>Open floor, glass</td><td class="n">11</td></tr>
+          <tr><td>EE-5F-long</td><td><span class="bld ee">EE</span></td><td class="n">295.7</td><td class="n">5,914</td><td class="n">8,723</td><td class="n">279.6</td><td>Multi-floor descent</td><td class="n">15</td></tr>
+          <tr><td>EE-stair-long</td><td><span class="bld ee">EE</span></td><td class="n">104.3</td><td class="n">2,085</td><td class="n">3,081</td><td class="n">76.0</td><td>Stair descent</td><td class="n">5.1</td></tr>
+          <tr><td>LIB-1F-a</td><td><span class="bld lib">Library</span></td><td class="n">539.5</td><td class="n">10,789</td><td class="n">15,876</td><td class="n">538.0</td><td>Library retraversals</td><td class="n">27</td></tr>
+          <tr><td>LIB-1F-b</td><td><span class="bld lib">Library</span></td><td class="n">524.3</td><td class="n">10,486</td><td class="n">15,401</td><td class="n">494.4</td><td>Library retraversal</td><td class="n">26</td></tr>
+          <tr><td>HANA-long</td><td><span class="bld hana">HANA</span></td><td class="n">321.8</td><td class="n">6,436</td><td class="n">9,538</td><td class="n">277.4</td><td>Return, glass passage</td><td class="n">16</td></tr>
         </tbody>
         <tfoot>
-          <tr><td>Total</td><td>3 buildings</td><td class="n">2,736</td><td class="n">54,715</td><td class="n">82,741</td><td class="n">2,485</td><td></td><td class="n">≈ 133</td></tr>
+          <tr><td>Total</td><td>3 buildings</td><td class="n">≈ 2,736</td><td class="n">54,715</td><td class="n">82,741</td><td class="n">2,485.2</td><td></td><td class="n">≈ 133</td></tr>
         </tfoot>
       </table>
     </div>
+    <p style="margin-top:16px">
+      The routes support local tracking, accumulated drift and trajectory correction through revisits.
+      EE-1F and EE-5F are open traversals ending 30 and 52&nbsp;m from their starts. EE-3F, EE-2F and HANA-long return to the
+      starting area without intermediate backtracking. EE-stair-B, EE-stair-C, LIB-1F-a and LIB-1F-b retrace parts of their
+      routes in the opposite direction. EE-508 and EE-250 observe the same room from different positions. EE-stair-A ascends
+      7.6&nbsp;m, EE-stair-long descends 16&nbsp;m, and EE-5F-long descends stairs and continues on a different floor.
+    </p>
 
     <figure class="narrow">
       <a class="zoom" href="assets/fig_reference_trajectories.png"><img src="assets/fig_reference_trajectories.png" width="754" height="882" loading="lazy"
            alt="Fourteen top views of the reference trajectories with start points, scale bars and a shared height color scale."></a>
-      <figcaption><b>Pseudo-ground-truth trajectories</b>, top view, colored by height above the start (black dot = start).</figcaption>
+      <figcaption><b>Reference trajectories</b>, gravity-aligned top views. Black markers indicate starting positions,
+        line color encodes height relative to the start, and scale bars indicate route extent.</figcaption>
     </figure>
 
+    <h3>Scene and motion indicators</h3>
+    <div class="two-col">
+      <div>
+        <p>Shared circulation spaces and library areas capture human activity alongside the static structures used for
+           navigation and mapping. Person presence has a duration-weighted mean of 54.2&nbsp;%, reaching 64–74&nbsp;% on several
+           lobby, library and connecting routes, including views in which people occupy a substantial part of the image.</p>
+        <p>Routes through transparent glass and reflective interiors expose differences between visible scene content and
+           physical surfaces: radar–depth support disagreement and depth holes have duration-weighted means of 12.2&nbsp;% and
+           2.5&nbsp;%. Glare, low-feature views, height changes and rapid turns add visual and motion challenges.</p>
+        <p>Bars give the per-sequence value, the dashed line the whole dataset, time-weighted.</p>
+      </div>
+      <figure style="margin:0">
+        <a class="zoom" href="assets/fig_dataset_character.png"><img src="assets/fig_dataset_character.png" width="733" height="1103" loading="lazy"
+             alt="Eight bar-chart panels over the 14 sequences: glass or see-through, depth holes, glare, low texture, stairs, fast turns, people in view and people near."></a>
+      </figure>
+    </div>
+
     <h3>Scenes</h3>
-    <p>Pedestrians, glass facades and partitions, mirror-like stone, a glass-roofed bridge, stairwells and textureless corridors.
-       The share of valid D455 depth pixels in the same frame is given under each image. People are blurred.</p>
+    <p>Pedestrians, glass facades and partitions, mirror-like stone, a glass-roofed passage, stairwells and textureless corridors.
+       HANA-long begins and ends in the same glass-roofed passage; in LIB-1F-a, 394–407&nbsp;s passes a black polished stone wall
+       in the stairwell. The share of valid D455 depth pixels in the same frame is given under each image. People are blurred.</p>
     <div class="gallery">
       <figure><img src="assets/gallery/EE-1F_00600.jpg" width="640" height="480" loading="lazy" alt="Lobby with walking pedestrians (blurred)."><figcaption><b>EE-1F</b> · lobby, pedestrians · depth 92&nbsp;%</figcaption></figure>
       <figure><img src="assets/gallery/HANA-long_02400.jpg" width="640" height="480" loading="lazy" alt="Corridor with a group of pedestrians walking towards the camera (blurred)."><figcaption><b>HANA-long</b> · group of pedestrians · depth 90&nbsp;%</figcaption></figure>
@@ -209,7 +269,7 @@
       <figure><img src="assets/gallery/EE-3F_01200.jpg" width="640" height="480" loading="lazy" alt="Open floor with a glass-walled office."><figcaption><b>EE-3F</b> · glass-walled office · depth 90&nbsp;%</figcaption></figure>
       <figure><img src="assets/gallery/EE-2F_00900.jpg" width="640" height="480" loading="lazy" alt="Corridor with a glass partition and reflections."><figcaption><b>EE-2F</b> · glass partition, reflections · depth 93&nbsp;%</figcaption></figure>
       <figure><img src="assets/gallery/LIB-1F-a_11700.jpg" width="640" height="480" loading="lazy" alt="Stairwell lined with black polished stone that reflects like a mirror."><figcaption><b>LIB-1F-a</b> · polished stone, mirror-like · depth 85&nbsp;%</figcaption></figure>
-      <figure><img src="assets/gallery/HANA-long_09000.jpg" width="640" height="480" loading="lazy" alt="Bridge with a glass roof and glass balustrades."><figcaption><b>HANA-long</b> · glass-roofed bridge · depth 83&nbsp;%</figcaption></figure>
+      <figure><img src="assets/gallery/HANA-long_09000.jpg" width="640" height="480" loading="lazy" alt="Bridge with a glass roof and glass balustrades."><figcaption><b>HANA-long</b> · glass-roofed passage · depth 83&nbsp;%</figcaption></figure>
       <figure><img src="assets/gallery/EE-stair-A_01800.jpg" width="640" height="480" loading="lazy" alt="Staircase with glass balustrades."><figcaption><b>EE-stair-A</b> · stairs, glass balustrade · depth 84&nbsp;%</figcaption></figure>
       <figure><img src="assets/gallery/EE-5F_05400.jpg" width="640" height="480" loading="lazy" alt="Long white corridor with glare at the end."><figcaption><b>EE-5F</b> · textureless corridor, glare · depth 95&nbsp;%</figcaption></figure>
       <figure><img src="assets/gallery/EE-stair-B_03300.jpg" width="640" height="480" loading="lazy" alt="Elevator lobby with steel doors."><figcaption><b>EE-stair-B</b> · elevator lobby, steel doors · depth 92&nbsp;%</figcaption></figure>
@@ -219,9 +279,11 @@
 
 <section id="glass">
   <div class="wrap">
-    <h2>Radar where depth sees through glass</h2>
-    <p>At glass doors and balustrades the D455 measures the hall behind the pane or returns no depth,
-       while the radar returns from the glass plane itself. Raw range profiles and on-board detections are recorded side by side.</p>
+    <h2>Radar and depth at transparent glass</h2>
+    <p>At glass doors and balustrades, parts of the depth image are unsupported or describe farther visible structure,
+       while the radar can return from the interface itself. Near the EE-1F glass balustrade, on-board detections occupy the
+       3.3–4&nbsp;m range, and raw range-profile peaks retain additional distance information beyond the embedded point selection.
+       In the top views, the profile arcs encode radial distance, not azimuth-localized reflectors.</p>
     <figure>
       <a class="zoom" href="assets/fig_depth_fail_radar.png"><img src="assets/fig_depth_fail_radar.png" width="1748" height="1472" loading="lazy"
            alt="Three glass scenes, each with a color image and radar detections, the depth image with missing regions, and a radar top view comparing radar and depth."></a>
@@ -232,14 +294,18 @@
         and the five strongest raw range-profile peaks (blue arcs; azimuth not resolved).
       </figcaption>
     </figure>
+    <p>Comparing camera-axis depth at projected radar points gives a median residual of −0.10&nbsp;m in two rooms and +1.09&nbsp;m
+       in three corridors, with 26.6&nbsp;% and 6.8&nbsp;% of samples within ±0.2&nbsp;m. This variation calls for scene-aware association
+       rather than treating every projected radar return as a measurement of the surface in the corresponding depth pixel.</p>
   </div>
 </section>
 
 <section id="benchmarks" class="alt">
   <div class="wrap">
     <h2>Benchmarks</h2>
-    <p>We run 31 baseline configurations against the pseudo-ground-truth: camera SLAM, VIO and odometry, radar odometry on
-       raw-ADC and on-board inputs, and feed-forward 3D reconstruction. Coverage, alignment and scale are reported for every run.</p>
+    <p>31 baseline configurations are evaluated against the pseudo-ground-truth: 11 camera motion configurations, seven radar
+       pipelines on two input representations each (raw ADC and on-board), and six image-based 3D reconstruction configurations.
+       Coverage, alignment and scale are reported for every run.</p>
     <div class="two-col">
       <figure class="narrow" style="margin:0">
         <a class="zoom" href="assets/fig_benchmark_summary.png"><img src="assets/fig_benchmark_summary.png" width="743" height="838" loading="lazy"
@@ -247,18 +313,34 @@
       </figure>
       <div>
         <h3 style="margin-top:0">Camera and radar motion over all 14 sequences</h3>
-        <p><b>Top:</b> ATE after SE(3) alignment on the metric runs (coverage ≥ 0.8 and Sim(3) scale 0.8–1.25);
-           bar = mean, line = min–max.</p>
-        <p><b>Bottom:</b> translation RPE over 1 s; bar = median over the 14 sequences, line = min–max (log scale).</p>
-        <p>Camera methods in blue, radar methods in red. Radar methods run on both the raw ADC
-           (<code>raw</code>) and the board's own detections (<code>board</code>).</p>
+        <p><b>Top:</b> mean rigid-aligned ATE over each method's runs with coverage ≥ 0.8 and scale 0.8–1.25; line = min–max.</p>
+        <p><b>Bottom:</b> median of the sequence-median one-second translation RPE; line = min–max (log scale).</p>
+        <p>DROID-SLAM RGB-D reaches 0.04&nbsp;m one-second RPE but 4.06&nbsp;m mean ATE, so local and route-scale errors are both reported.
+           The propagation-only Doppler–IMU baseline yields 0.13&nbsp;m aggregate one-second RPE with raw-derived input and 0.77&nbsp;m
+           with on-board input from the same recordings.</p>
       </div>
     </div>
+
+    <h3>Camera and radar across indoor conditions</h3>
+    <p>On the furnished EE-508 room, the camera configurations reach 0.22–0.41&nbsp;m ATE against 1.4&nbsp;m for the raw Doppler–IMU
+       baseline. On the glass-rich, reflective EE-stair-C, the same radar–IMU baseline reaches 3.0&nbsp;m ATE at 0.99 coverage, against
+       9.11&nbsp;m for DROID-SLAM RGB-D and 15.50&nbsp;m for ORB-SLAM3 RGB-D.</p>
+    <figure class="medium">
+      <a class="zoom" href="assets/fig_camera_radar_cases.png"><img src="assets/fig_camera_radar_cases.png" width="1734" height="1382" loading="lazy"
+           alt="Camera and radar trajectory top views against the reference for EE-508 and EE-stair-C, each row with a scene image."></a>
+      <figcaption><b>Camera and radar trajectories on EE-508 (top) and EE-stair-C (bottom)</b>, with a scene image of each route.</figcaption>
+    </figure>
+
+    <h3>Image-based 3D reconstruction</h3>
+    <p>Six configurations on 13 sequences are compared with depth integrated at the pseudo-ground-truth poses
+       (2&nbsp;cm voxels; accuracy, completeness and F1 at 5 and 10&nbsp;cm). Pi3 reaches the highest mean refined F1 at 5&nbsp;cm, 0.33,
+       with a median fitted scale of 4.95, while MapAnything has a median recovered scale of 0.92: aligned geometry and metric
+       scale are reported separately.</p>
     <figure>
       <a class="zoom" href="assets/fig_recon3d_gallery.png"><img src="assets/fig_recon3d_gallery.png" width="1756" height="446" loading="lazy"
            alt="Top views of the EE-508 room: depth reference and four image-based reconstructions, colored by height."></a>
-      <figcaption><b>3D reconstruction of the EE-508 room</b> after alignment: the depth-integrated reference and four
-        image-based methods, top view colored by height.</figcaption>
+      <figcaption><b>Aligned reconstructions of the EE-508 room</b>: the depth-integrated reference and four image-based methods,
+        top view colored by height.</figcaption>
     </figure>
   </div>
 </section>
@@ -267,35 +349,43 @@
   <div class="wrap">
     <h2>Data</h2>
     <p class="note">The dataset will be released on Hugging Face after the review process, as one archive per sequence.</p>
-    <h3>Layout of one sequence</h3>
-<pre><code>&lt;sequence&gt;/
-├── mmwave/
-│   ├── raw/            adc.bin  format.json  frames.csv   <span class="cm"># raw ADC, int16 I/Q, 1,572,864 B per frame</span>
-│   ├── pointcloud/     points.csv  frames.csv             <span class="cm"># on-board detections</span>
-│   ├── range_profile/  range_profile.npy  noise_profile.npy  frames.csv
-│   ├── stats/          frames.csv                         <span class="cm"># on-board DSP timing, CPU load, temperature</span>
-│   ├── tlv/            packets.dat                        <span class="cm"># raw UART packets from the board</span>
-│   └── radar_cfg.txt                                      <span class="cm"># chirp configuration sent to the board</span>
-├── rgb/                000000.jpg …                       <span class="cm"># 640×480 color</span>
-├── depth/              000000.npy …                       <span class="cm"># 640×480 uint16, millimetres</span>
-├── imu/                accel.csv  gyro.csv
-├── meta/               session.json  events.csv  alignment.csv
-├── intrinsic.txt
-└── extrinsic.txt</code></pre>
-    <p>Conventions: radar frame x right, y forward, z up; camera frame x right, y down, z forward.
-       <code>extrinsic.txt</code> blocks <code>[A_to_B]</code> give <code>p_B = R p_A + t</code>.
-       Pseudo-ground-truth trajectories are provided in TUM format (<code>t x y z qx qy qz qw</code>).</p>
-    <p>The loader applies three corrections when a sequence is opened: raw frame times are taken from the radar start event
-       (mid-frame), on-board radial velocities are rescaled to the recorded 0.152 m/s Doppler bin, and on-board frame times
-       are de-jittered with the frame counter. Read the files through the toolkit, or apply the same corrections yourself.</p>
+    <h3>Export layout</h3>
+<pre><code>&lt;export root&gt;/
+├── index.csv                                                <span class="cm"># sequence names, sources, counts, ADC size checks</span>
+└── &lt;sequence&gt;/
+    ├── mmwave/
+    │   ├── raw/            adc.bin  format.json  frames.csv     <span class="cm"># int16 I/Q, 1,572,864 B per frame</span>
+    │   ├── pointcloud/     points.csv  frames.csv               <span class="cm"># on-board detections</span>
+    │   ├── range_profile/  range_profile.npy  noise_profile.npy  frames.csv   <span class="cm"># 192-bin profiles</span>
+    │   ├── tracks/         tracks.csv                           <span class="cm"># tracking-header schema</span>
+    │   ├── stats/          frames.csv                           <span class="cm"># processing times, CPU load, temperature</span>
+    │   ├── tlv/            packets.dat                          <span class="cm"># original UART type–length–value packets</span>
+    │   └── radar_cfg.txt                                        <span class="cm"># device commands and calibration coefficients</span>
+    ├── rgb/                000000.jpg …  timestamps.csv         <span class="cm"># 640×480 color</span>
+    ├── depth/              000000.npy …  timestamps.csv         <span class="cm"># native depth grid, uint16 millimetres</span>
+    ├── imu/                accel.csv  gyro.csv                  <span class="cm"># host and device timestamps</span>
+    ├── meta/               session.json  events.csv  alignment.csv
+    ├── intrinsic.txt                                            <span class="cm"># INI: color, depth, camera_device, radar, imu</span>
+    └── extrinsic.txt                                            <span class="cm"># sensor transforms and timing metadata</span></code></pre>
+    <p>Conventions: radar points use right–forward–up coordinates and depth-camera points right–down–forward;
+       a radar point maps into the depth-camera frame as <code>p_D = R_DR p_R + t_DR</code>, with the designed parallel boresight
+       and a mechanical translation tolerance of several millimetres. Depth stays in its native grid, and projection into the
+       color raster uses the recorded calibration. Pseudo-ground-truth trajectories are in TUM format
+       (<code>t x y z qx qy qz qw</code>): depth-camera-to-world poses in metres with camera host timestamps.</p>
+    <p>The loader corrections leave the files unchanged: raw frame times are taken from the radar sensor start and frame centre,
+       on-board radial velocities are rescaled to the recorded 0.152&nbsp;m/s Doppler bin, and on-board frame times are fitted to the
+       frame counter. Read the files through the toolkit, or apply the same corrections yourself.</p>
   </div>
 </section>
 
 <section id="toolkit" class="alt">
   <div class="wrap">
     <h2>Toolkit</h2>
-    <p>RIVET-tools loads a sequence, decodes DDMA, projects radar points into the images and runs the evaluation.
-       It is released together with the dataset; the examples below show the interface.</p>
+    <p>RIVET-tools (Python package <code>mv3rkit</code>) gives lazy access to raw ADC samples, on-board detections and profiles,
+       color, depth, IMU and calibration, keeping recording events, configuration, original timestamps and integrity diagnostics.
+       It provides DDMA separation, range–Doppler products, configurable cell extraction, coordinate conversion, camera projection
+       and depth-cloud construction, and connects the observations to pseudo-ground-truth trajectories and baseline adapters for
+       evaluation. It is released together with the dataset; the examples below show the interface.</p>
 <pre><code>pip install -e .            <span class="cm"># core: numpy, scipy, opencv</span>
 pip install -e .[viz,bench] <span class="cm"># + matplotlib, open3d, pandas</span></code></pre>
 <pre><code>from mv3rkit import Sequence
@@ -324,7 +414,10 @@ mv3r export RIVET/EE-250 tum out/tum/EE-250</code></pre>
     <h2>Release</h2>
     <p>The paper is under double-blind review. The dataset, RIVET-tools, the citation and the licenses will be published
        on this page after the review process.</p>
-    <p>People appearing in the color images are blurred on this page and in the released data.</p>
+    <p>Scene images on this page use person masking and blur to reduce identifiability. Before public release, the recordings
+       will undergo a review of identifiable people, visible personal information and location-sensitive content, with
+       appropriate redaction of the distributed images. The dataset and toolkit are intended for research on sensing and
+       spatial perception.</p>
   </div>
 </section>
 
