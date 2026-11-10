@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sky" data-buttons="tonal" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RIVET: indoor radar, RGB-D and inertial dataset around transparent surfaces</title>
+<meta name="description" content="An indoor dataset pairing raw cascaded-radar signals and on-board outputs from the same acquisition with RGB-D and inertial observations: 14 sequences across three buildings.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RIVET: Indoor Multimodal Dataset Pairing Raw Radar Signals and On-Board Outputs around Transparent Surfaces">
+<meta property="og:description" content="14 sequences across three buildings, approximately 2.49 km of reference-derived routes and 82,741 color–depth frame pairs.">
+<meta property="og:url" content="https://rivet-dataset.github.io/">
+<meta property="og:image" content="https://rivet-dataset.github.io/share.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="media/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ffffff">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<style>
+:root {
+  --p-bg: #ffffff; --p-surface: #f4f4f4; --p-ink: #111111; --p-muted: #6b6b6b;
+  --p-accent: #1a4be0; --p-accent-ink: #ffffff; --p-action: #1a4be0; --p-action-ink: #ffffff;
+  --p-inv-bg: #111111; --p-inv-surface: #1e1e1e; --p-inv-ink: #ffffff; --p-inv-muted: #9a9a9a;
+  --p-inv-accent: #ffffff; --p-inv-accent-ink: #111111; --p-inv-action: #ffffff; --p-inv-action-ink: #111111;
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-text: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.035em;
+  --display-tracking-xl: -0.045em;
+}
+</style>
+<link rel="stylesheet" href="assets/ui/base.css">
+<link rel="stylesheet" href="assets/ui/window/fragment.css">
+<link rel="stylesheet" href="assets/ui/code/fragment.css">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="assets/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="assets/moments/moments.js">
+<link rel="modulepreload" href="assets/moments/lib.js">
+<link rel="modulepreload" href="assets/moments/liquid-type/moment.js">
+<style>
+  /* page CSS: only inside visuals */
+  .menu-card .panel { --p-h: 200px; }
+  .viz { padding: 0; }
+  .viz__body { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 14px 16px 18px; }
+  .viz__body span { display: block; font: 500 12px/1 var(--font-mono); margin-bottom: 8px; }
+  .viz__body img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; display: block; }
+  .app.ui { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7); background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow); }
+  .app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+  .app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
+  .app > .app__pane > .ui-panel { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+  .app > .app__pane::after { content: ""; position: absolute; inset: auto 0 0 0; height: 64px; background: linear-gradient(transparent, var(--u-bg)); pointer-events: none; }
+  @media (min-width: 1024px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } }
+  @media (max-width: 1023px) {
+    .app.ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .app > .app__pane--list { max-height: 252px; }
+    .app > .app__pane--list::after { display: none; }
+    .app .ui-win__side { display: none; }
+    .app .ui-win__body { grid-template-columns: minmax(0, 1fr); }
+    .app > .app__pane + .app__pane { border-left: 0; border-top: 1px solid var(--u-line); }
+  }
+  @media (max-width: 639px) {
+    .app.ui { grid-template-rows: minmax(0, 1fr); }
+    .app > .app__pane--list { display: none; }
+    .app > .app__pane + .app__pane { border-top: 0; }
+  }
+  .fig { background: #fff; display: grid; place-items: center; overflow: hidden; }
+  .fig > img { width: 100%; height: 100%; object-fit: contain; }
+  .fig--tall { height: 588px; }
+  .wall { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; }
+  .wall img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .tbl th, .tbl td { padding: 6px 10px 6px 0; text-align: left; border-bottom: 1px solid var(--line); line-height: 20px; }
+  .tbl th { font-weight: 500; }
+  .tbl .n { text-align: right; }
+  .tbl tfoot td { font-weight: 500; }
+  #benchmarks .frame { height: 520px; }
+  @media (max-width: 1023px) { .wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } .fig--tall { height: 480px; } }
+  @media (max-width: 639px) { .viz__body { grid-template-columns: 1fr 1fr; } .viz__body div:last-child { display: none; } .tbl { font-size: 13px; } .tbl .opt { display: none; } #benchmarks .frame { height: 360px; } }
+  .hero--centred .hero__lead { color: var(--ink); }
+  .photo { height: 588px; } .photo--low { height: 330px; }
+  .photo > img { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 1023px) { .photo { height: 420px; } .photo--low { height: 260px; } }
+  @media (max-width: 639px) { .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ui-code__pre .c, .ui-code__ln:nth-of-type(n+16) { display: none; } }
+  @media (max-width: 359px) { .close--type .btn--xl { min-width: 0; white-space: normal; font-size: 16px; } .closing__links .grid > * { min-width: 0; } }
+  @media (max-width: 639px) {
+    #platform .photo { height: 780px; }
+    #abstract .fig > img { height: 500px; }
+    #sequences .fig--tall { height: 760px; }
+    #glass .fig > img { height: 300px !important; object-fit: cover; object-position: left center; }
+  }
+  @media (max-width: 359px) { .hero--centred .pill { white-space: normal; flex-wrap: wrap; justify-content: center; max-width: 100%; } }
+</style>
+</head>
+<body>
+<!-- type: software
+     deal: hero centred, nav-cards, close-type, footer-columns, rhythm dark-band, buttons tonal, mark arc,
+           palette white-link-blue (the paper figures stand on white), type geist, radius sharp, lit ground sky
+     moments: liquid-type (#pairing) -->
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Skip to content</a>
+    <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>RIVET</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item">
+        <a class="nav__link" href="#sequences">Dataset <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <a class="menu-card span-4" href="#sequences">
+              <div class="panel"><img class="frame__img" src="media/gallery/HANA-long_09000.jpg" alt="Glass-roofed passage with glass balustrades"></div>
+              <span class="t-card">Sequences</span>
+              <span class="t-small muted">14 sequences across three buildings</span>
+            </a>
+            <a class="menu-card span-4" href="#scenes">
+              <div class="panel"><img class="frame__img" src="media/gallery/EE-stair-B_00900.jpg" alt="Lobby with a tall glass facade"></div>
+              <span class="t-card">Scenes</span>
+              <span class="t-small muted">Transparent and reflective surfaces</span>
+            </a>
+            <a class="menu-card span-4" href="#platform">
+              <div class="panel"><img class="frame__img" src="media/rig_front.jpg" alt="Hand-held rig with a D455 camera above a cascaded radar board"></div>
+              <span class="t-card">Platform</span>
+              <span class="t-small muted">Two-chip AWR2243 cascade and a D455</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__link" href="#toolkit">Toolkit</a></div>
+      <div class="nav__item"><a class="nav__link" href="#glass">Glass</a></div>
+      <div class="nav__item"><a class="nav__link" href="#benchmarks">Benchmarks</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="#download">Download the dataset</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <a class="pill" href="#sequences"><span>14 sequences across three buildings</span><span class="muted">approximately 2.49 km</span></a>
+        <h1 id="hero-h">RIVET: Indoor Multimodal Dataset</h1>
+        <p class="hero__lead">Raw cascaded-radar signals and on-board outputs from the same acquisition, with RGB-D and inertial observations.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="#download">Download the dataset</a><a class="btn btn--secondary" href="#abstract">Read the abstract</a></div>
+      </div>
+      <div class="hero__window" role="img" aria-label="One EE-1F frame as a color image, a depth image and a radar range–Doppler map">
+        <div class="ly-piece ui ui-panel viz" aria-hidden="true">
+          <div class="ui-win__bar"><span class="ui-dots"><i></i><i></i><i></i></span><span class="ui-win__crumb">RIVET <i>/</i> <b>EE-1F</b></span><span class="ui-spacer"></span><span class="ui-meta">mv3r viz</span></div>
+          <div class="viz__body" data-ly-steps="900">
+            <div><span>color</span><img src="media/viz_color.jpg" alt="" fetchpriority="high"></div>
+            <div data-step><span>depth, 0–8 m</span><img src="media/viz_depth.jpg" alt=""></div>
+            <div data-step><span>range–Doppler</span><img src="media/viz_radar.jpg" alt=""></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section" id="abstract" style="--hm: 2" aria-labelledby="abstract-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-6">
+          <h2 id="abstract-h">Abstract</h2>
+          <div class="stack-4 measure" style="margin-top: var(--s-5)">
+            <p>Transparent glass can cause RGB-D measurements to describe backgrounds rather than physical barriers, motivating complementary radar sensing for indoor navigation and mapping. To support the development and evaluation of such multimodal approaches, we introduce RIVET, an indoor dataset pairing raw cascaded-radar signals and on-board outputs from the same acquisition with RGB-D and inertial observations.</p>
+            <p>The collection contains 14 sequences across three buildings, spanning approximately 2.49&nbsp;km of reference-derived routes and 82,741 color–depth frame pairs. The routes include transparent and reflective surfaces, pedestrian activity, open paths, revisits, and multi-floor motion.</p>
+            <p>We provide RIVET-tools for processing and evaluation, pseudo-ground-truth trajectories, and 31 baseline configurations covering camera and radar motion estimation and image-based 3D reconstruction. The evaluated Doppler–inertial processing paths yield aggregate one-second translation relative pose errors of 0.13&nbsp;m with raw-derived input and 0.77&nbsp;m with on-board input, highlighting processing-dependent differences within paired recordings.</p>
+          </div>
+        </div>
+        <figure class="frame fig span-6 start-7" style="margin:0">
+          <img src="media/fig_environment.jpg" width="1600" height="1363" alt="An RGB-D camera and an mmWave radar face a glass pane with a box behind it: the camera finds no features on the glass, the radar receives a return from the glass and from the box." data-source="client" data-subject="paper figure 1">
+          <figcaption class="t-small" style="padding: 12px 16px">Optical and radar observations of transparent glass. RGB-D observations may describe the visible background rather than the glass surface, while radar can capture returns from both the glass interface and background objects.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="toolkit" aria-labelledby="toolkit-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <h2 class="span-5" id="toolkit-h">Each sequence occupies one directory</h2>
+        <p class="span-6 start-7">RIVET-tools connects the route-based collection to processing and evaluation through a common sequence interface. The implementation package <code>mv3rkit</code> provides lazy access to these streams. <a class="link" href="#sequences">See the sequences</a></p>
+      </div>
+      <div class="ui app fill" role="img" aria-label="The 14 sequence directories beside the files of one sequence and the loader call that opens it" data-ui-pause-host>
+        <div class="app__pane app__pane--list">
+          <div class="ui ui-panel ui-win" data-ui="window" data-ui-still data-open="EE" data-work="EE" data-done="EE">
+            <div class="ui-win__bar">
+              <span class="ui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="ui-win__crumb">RIVET <i>/</i> <b>index.csv</b></span>
+              <span class="ui-spacer"></span>
+            </div>
+            <div class="ui-win__body">
+              <nav class="ui-win__side" aria-hidden="true">
+                <span class="ui-win__nav is-on">All<em>14</em></span>
+                <span class="ui-win__nav">EE<em>11</em></span>
+                <span class="ui-win__nav">LIB<em>2</em></span>
+                <span class="ui-win__nav">HANA<em>1</em></span>
+              </nav>
+              <div class="ui-win__main">
+                <div class="ui-win__cols" aria-hidden="true"><span>Sequence</span><span>Route type</span><span>Path</span><span>Radar</span></div>
+                <ul class="ui-win__rows">
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-508</span><span class="ui-win__sub">Room views</span><span class="ui-win__st is-done">29.4 m</span><span class="ui-win__age">62.3 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-250</span><span class="ui-win__sub">Room views</span><span class="ui-win__st is-done">34.2 m</span><span class="ui-win__age">74.3 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-3F</span><span class="ui-win__sub">Return near start</span><span class="ui-win__st is-done">93.2 m</span><span class="ui-win__age">52.0 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-2F</span><span class="ui-win__sub">Return near start</span><span class="ui-win__st is-done">82.0 m</span><span class="ui-win__age">100.9 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-1F</span><span class="ui-win__sub">Open lobby, glass</span><span class="ui-win__st is-done">48.8 m</span><span class="ui-win__age">60.6 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-stair-A</span><span class="ui-win__sub">Stair ascent</span><span class="ui-win__st is-done">47.1 m</span><span class="ui-win__age">71.6 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-stair-B</span><span class="ui-win__sub">Stair retraversal</span><span class="ui-win__st is-done">116.5 m</span><span class="ui-win__age">124.7 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-stair-C</span><span class="ui-win__sub">Stair retraversals</span><span class="ui-win__st is-done">168.0 m</span><span class="ui-win__age">178.8 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-5F</span><span class="ui-win__sub">Open floor, glass</span><span class="ui-win__st is-done">200.6 m</span><span class="ui-win__age">225.2 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-5F-long</span><span class="ui-win__sub">Multi-floor descent</span><span class="ui-win__st is-done">279.6 m</span><span class="ui-win__age">295.7 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="1">EE</span><span class="ui-win__who">EE-stair-long</span><span class="ui-win__sub">Stair descent</span><span class="ui-win__st is-done">76.0 m</span><span class="ui-win__age">104.3 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="3">LI</span><span class="ui-win__who">LIB-1F-a</span><span class="ui-win__sub">Library retraversals</span><span class="ui-win__st is-done">538.0 m</span><span class="ui-win__age">539.5 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="3">LI</span><span class="ui-win__who">LIB-1F-b</span><span class="ui-win__sub">Library retraversal</span><span class="ui-win__st is-done">494.4 m</span><span class="ui-win__age">524.3 s</span></li>
+                  <li class="ui-win__row"><span class="ui-avatar" data-tone="4">HA</span><span class="ui-win__who">HANA-long</span><span class="ui-win__sub">Return, glass passage</span><span class="ui-win__st is-done">277.4 m</span><span class="ui-win__age">321.8 s</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app__pane app__pane--open">
+          <div class="ui ui-panel ui-code" data-ui="code" data-ui-still>
+            <div class="ui-code__tabs">
+              <span class="ui-code__tab is-on"><i class="ui-code__lang">DIR</i>EE-1F/</span>
+              <span class="ui-code__tab"><i class="ui-code__lang">PY</i>load.py</span>
+              <span class="ui-spacer"></span>
+            </div>
+<pre class="ui-code__pre"><code><span class="ui-code__ln" data-n="1">mmwave/raw/adc.bin              <span class="c"># signed 16-bit complex, 1,572,864 bytes per frame</span></span>
+<span class="ui-code__ln" data-n="2">mmwave/raw/frames.csv           <span class="c"># frame, t_rel_s, t_wall</span></span>
+<span class="ui-code__ln" data-n="3">mmwave/raw/format.json          <span class="c"># frame dimensions, parser layout, radar profile</span></span>
+<span class="ui-code__ln" data-n="4">mmwave/radar_cfg.txt            <span class="c"># transmitted device commands</span></span>
+<span class="ui-code__ln is-mark" data-n="5">mmwave/pointcloud/points.csv    <span class="c"># detection coordinates, range, angles, Doppler</span></span>
+<span class="ui-code__ln" data-n="6">mmwave/pointcloud/frames.csv    <span class="c"># frame counters, UART arrival times</span></span>
+<span class="ui-code__ln" data-n="7">mmwave/range_profile/           <span class="c"># 192-bin range profiles with frames.csv</span></span>
+<span class="ui-code__ln" data-n="8">mmwave/tracks/tracks.csv        <span class="c"># tracking-header schema</span></span>
+<span class="ui-code__ln" data-n="9">mmwave/stats/frames.csv         <span class="c"># processing times, CPU load, temperature</span></span>
+<span class="ui-code__ln" data-n="10">mmwave/tlv/packets.dat          <span class="c"># preserved UART type–length–value packets</span></span>
+<span class="ui-code__ln" data-n="11">rgb/  depth/                    <span class="c"># color JPEGs and native-grid depth arrays</span></span>
+<span class="ui-code__ln" data-n="12">imu/accel.csv  imu/gyro.csv     <span class="c"># host and device timestamps</span></span>
+<span class="ui-code__ln" data-n="13">intrinsic.txt  extrinsic.txt    <span class="c"># intrinsics, sensor transforms, timing</span></span>
+<span class="ui-code__ln" data-n="14">meta/session.json  events.csv   <span class="c"># counts, rates, recording events</span></span>
+<span class="ui-code__ln" data-n="15">meta/alignment.csv              <span class="c"># export-time camera/radar association</span></span>
+<span class="ui-code__ln" data-n="16"></span>
+<span class="ui-code__ln" data-n="17"><span class="k">from</span> mv3rkit <span class="k">import</span> Sequence</span>
+<span class="ui-code__ln" data-n="18"><span class="k">from</span> mv3rkit.radar <span class="k">import</span> dsp</span>
+<span class="ui-code__ln" data-n="19"></span>
+<span class="ui-code__ln" data-n="20">seq = <span class="f">Sequence</span>(<span class="n">"RIVET/EE-1F"</span>)</span>
+<span class="ui-code__ln" data-n="21">cube = seq.radar.<span class="f">adc</span>(<span class="n">100</span>, <span class="n">102</span>)       <span class="c"># (2, 256 chirps, 8 rx, 192 samples)</span></span>
+<span class="ui-code__ln" data-n="22">d = dsp.<span class="f">ddma_demodulate</span>(cube)        <span class="c"># d["tx"]: (2, 6 tx, 32 doppler, 8 rx, 192 range)</span></span>
+<span class="ui-code__ln" data-n="23">rgb, depth = seq.<span class="f">rgb</span>(<span class="n">500</span>), seq.<span class="f">depth</span>(<span class="n">500</span>)</span>
+<span class="ui-code__ln" data-n="24">pc = seq.pointcloud.<span class="f">frame</span>(seq.<span class="f">nearest_pc_frame</span>(<span class="n">500</span>))</span>
+<span class="ui-code__ln" data-n="25">uv, z, inside = <span class="f">radar_to_pixels</span>(pc[:, :<span class="n">3</span>], seq.calib, <span class="n">"color"</span>)</span>
+<span class="ui-code__ln" data-n="26"></span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contributions" style="--hm: 2" aria-labelledby="contrib-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-6">
+          <h2 id="contrib-h">Our contributions</h2>
+          <p style="margin-top: var(--s-4)">Research uses of RIVET across visual geometry, radar perception, and multimodal fusion.</p>
+          <div class="frame fig" style="margin-top: var(--s-6); height: 420px"><img src="media/fig_usages.jpg" width="1600" height="1133" loading="lazy" alt="Color and depth images feed visual SLAM, 3D reconstruction and odometry; radar measurements feed radar SLAM and object detection; both branches feed fusion algorithms." data-source="client" data-subject="paper figure: research uses"></div>
+        </div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>Continuous indoor routes with transparent surfaces and human activity</h3>
+            <p>The collection spans three buildings and combines glass-lined corridors, reflective surfaces, pedestrian activity, and stair traversals with extended routes and varied platform motion. Sequence-level scene and motion indicators characterize these conditions and support the selection of recordings for targeted evaluation.</p></div>
+          <div class="faq__item"><h3>A multimodal dataset linking raw radar signals and on-board outputs</h3>
+            <p>We provide 14 sequences spanning 2.49&nbsp;km of reference-derived routes, pairing raw cascaded-radar ADC samples and recorded on-board products from the same acquisition with RGB-D and inertial observations.</p></div>
+          <div class="faq__item"><h3>A reusable processing and evaluation toolkit</h3>
+            <p>We provide a common sequence interface for DDMA decoding, radar representations, temporal association, geometric projection, visualization, and export, retaining acquisition metadata and processing conventions. We complement this interface with pseudo-ground-truth trajectories and 31 baseline configurations spanning camera motion, radar motion, and image-based 3D reconstruction, with coverage, alignment, and scale reported explicitly.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section statement ground-inverse" id="pairing" aria-labelledby="pairing-h">
+    <div class="wrap">
+      <div data-moment="liquid-type" class="section-head" style="max-width:none">
+        <h2 class="mo-lt__type" id="pairing-h">Raw radar signals and on-board outputs</h2>
+        <p class="t-lead measure" style="margin-top: var(--s-6)">When both levels are recorded from the same acquisition, researchers can change a processing choice without collecting a different traversal.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="platform" style="--hm: 2" aria-labelledby="platform-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-6">
+          <h2 id="platform-h">Recording configuration</h2>
+          <table class="tbl" style="margin-top: var(--s-6)">
+            <thead><tr><th>Component</th><th>Configuration</th></tr></thead>
+            <tbody>
+              <tr><td>Radar</td><td>Two AWR2243 devices, 6 Tx, 8 Rx, DDMA</td></tr>
+              <tr><td>Raw frame</td><td>256 × 8 × 192 complex samples, 20 Hz</td></tr>
+              <tr><td>Fast-time sampling</td><td>5 MS/s, 192 samples, 44.41 MHz/µs</td></tr>
+              <tr><td>Chirp timing</td><td>5 µs idle, 45 µs ramp, 256 chirps</td></tr>
+              <tr><td>Range sampling</td><td>0.0879 m per bin, 16.9 m sampled span</td></tr>
+              <tr><td>Doppler sampling</td><td>0.152 m/s per bin, 32 bins per DDMA band</td></tr>
+              <tr><td>On-board products</td><td>Detections, profiles, statistics, packets</td></tr>
+              <tr><td>Color / depth</td><td>640 × 480, nominal 30 Hz, native depth grid</td></tr>
+              <tr><td>IMU</td><td>Accelerometer and gyroscope, nominal 400 Hz</td></tr>
+              <tr><td>Extrinsics</td><td>Mechanical radar mount, factory camera calibration</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: var(--s-5)">Rates are nominal configuration values. The evaluated raw front end uses a four-receiver sub-array, not the full virtual aperture.</p>
+        </div>
+        <div class="frame frame--photo photo span-6 start-7">
+          <img class="frame__img" src="media/rig_front.jpg" width="800" height="1200" loading="lazy" alt="Front of the hand-held rig: a RealSense D455 mounted above the two-chip AWR2243 cascade board" data-source="client" data-subject="acquisition rig, front">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="sequences" style="--hm: 2" aria-labelledby="sequences-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-6">
+          <h2 id="sequences-h">Sequence inventory</h2>
+          <table class="tbl" style="margin-top: var(--s-5)">
+            <thead><tr><th>Sequence</th><th class="n">Radar (s)</th><th class="n opt">Raw frames</th><th class="n opt">RGB-D frames</th><th class="n">Path (m)</th><th>Route type</th></tr></thead>
+            <tbody>
+              <tr><td>EE-508</td><td class="n">62.3</td><td class="n opt">1,245</td><td class="n opt">1,858</td><td class="n">29.4</td><td>Room views</td></tr>
+              <tr><td>EE-250</td><td class="n">74.3</td><td class="n opt">1,486</td><td class="n opt">2,188</td><td class="n">34.2</td><td>Room views</td></tr>
+              <tr><td>EE-3F</td><td class="n">52.0</td><td class="n opt">1,040</td><td class="n opt">3,760</td><td class="n">93.2</td><td>Return near start</td></tr>
+              <tr><td>EE-2F</td><td class="n">100.9</td><td class="n opt">2,018</td><td class="n opt">2,959</td><td class="n">82.0</td><td>Return near start</td></tr>
+              <tr><td>EE-1F</td><td class="n">60.6</td><td class="n opt">1,211</td><td class="n opt">1,798</td><td class="n">48.8</td><td>Open lobby, glass</td></tr>
+              <tr><td>EE-stair-A</td><td class="n">71.6</td><td class="n opt">1,432</td><td class="n opt">2,096</td><td class="n">47.1</td><td>Stair ascent</td></tr>
+              <tr><td>EE-stair-B</td><td class="n">124.7</td><td class="n opt">2,494</td><td class="n opt">3,666</td><td class="n">116.5</td><td>Stair retraversal</td></tr>
+              <tr><td>EE-stair-C</td><td class="n">178.8</td><td class="n opt">3,575</td><td class="n opt">5,224</td><td class="n">168.0</td><td>Stair retraversals</td></tr>
+              <tr><td>EE-5F</td><td class="n">225.2</td><td class="n opt">4,504</td><td class="n opt">6,573</td><td class="n">200.6</td><td>Open floor, glass</td></tr>
+              <tr><td>EE-5F-long</td><td class="n">295.7</td><td class="n opt">5,914</td><td class="n opt">8,723</td><td class="n">279.6</td><td>Multi-floor descent</td></tr>
+              <tr><td>EE-stair-long</td><td class="n">104.3</td><td class="n opt">2,085</td><td class="n opt">3,081</td><td class="n">76.0</td><td>Stair descent</td></tr>
+              <tr><td>LIB-1F-a</td><td class="n">539.5</td><td class="n opt">10,789</td><td class="n opt">15,876</td><td class="n">538.0</td><td>Library retraversals</td></tr>
+              <tr><td>LIB-1F-b</td><td class="n">524.3</td><td class="n opt">10,486</td><td class="n opt">15,401</td><td class="n">494.4</td><td>Library retraversal</td></tr>
+              <tr><td>HANA-long</td><td class="n">321.8</td><td class="n opt">6,436</td><td class="n opt">9,538</td><td class="n">277.4</td><td>Return, glass passage</td></tr>
+            </tbody>
+            <tfoot><tr><td>Total</td><td class="n">≈2,736</td><td class="n opt">54,715</td><td class="n opt">82,741</td><td class="n">2,485.2</td><td></td></tr></tfoot>
+          </table>
+        </div>
+        <div class="frame fig fig--tall span-6 start-7"><img src="media/fig_reference_trajectories.png" width="893" height="1044" loading="lazy" alt="Fourteen gravity-aligned top views of the reference trajectories with starting positions, scale bars and a shared height color scale" data-source="client" data-subject="paper figure: reference trajectories"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="scenes" aria-labelledby="scenes-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <h2 class="span-5" id="scenes-h">Indoor routes and optical surface conditions</h2>
+        <p class="span-6 start-7">The recordings combine transparent and reflective surfaces, human activity, and varied platform motion. Person presence has a duration-weighted mean of 54.2%, with sequence-level values reaching 64–74% on several lobby, library, and connecting routes.</p>
+      </div>
+      <div class="wall" style="margin-top: var(--s-7)">
+        <img src="media/gallery/EE-1F_00600.jpg" width="640" height="480" loading="lazy" alt="Lobby with walking pedestrians" data-source="client" data-subject="EE-1F">
+        <img src="media/gallery/HANA-long_02400.jpg" width="640" height="480" loading="lazy" alt="Corridor with a group of pedestrians" data-source="client" data-subject="HANA-long">
+        <img src="media/gallery/LIB-1F-a_00600.jpg" width="640" height="480" loading="lazy" alt="Library reading room with study carrels" data-source="client" data-subject="LIB-1F-a">
+        <img src="media/gallery/HANA-long_03600.jpg" width="640" height="480" loading="lazy" alt="Arcade with glass shop fronts and a polished floor" data-source="client" data-subject="HANA-long">
+        <img src="media/gallery/EE-stair-B_00900.jpg" width="640" height="480" loading="lazy" alt="Lobby with a tall glass facade" data-source="client" data-subject="EE-stair-B">
+        <img src="media/gallery/EE-3F_01200.jpg" width="640" height="480" loading="lazy" alt="Open floor with a glass-walled office" data-source="client" data-subject="EE-3F">
+        <img src="media/gallery/EE-2F_00900.jpg" width="640" height="480" loading="lazy" alt="Corridor with a glass partition and reflections" data-source="client" data-subject="EE-2F">
+        <img src="media/gallery/LIB-1F-a_11700.jpg" width="640" height="480" loading="lazy" alt="Stairwell lined with black polished stone" data-source="client" data-subject="LIB-1F-a">
+        <img src="media/gallery/HANA-long_09000.jpg" width="640" height="480" loading="lazy" alt="Glass-roofed passage with glass balustrades" data-source="client" data-subject="HANA-long">
+        <img src="media/gallery/EE-stair-A_01800.jpg" width="640" height="480" loading="lazy" alt="Staircase with glass balustrades" data-source="client" data-subject="EE-stair-A">
+        <img src="media/gallery/EE-5F_05400.jpg" width="640" height="480" loading="lazy" alt="Long white corridor with glare" data-source="client" data-subject="EE-5F">
+        <img src="media/gallery/EE-stair-B_03300.jpg" width="640" height="480" loading="lazy" alt="Elevator lobby with steel doors" data-source="client" data-subject="EE-stair-B">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="indicators" aria-labelledby="indicators-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-6">
+          <h2 id="indicators-h">Sequence-level scene and motion indicators</h2>
+          <div class="stack-4 measure" style="margin-top: var(--s-5)">
+            <p>Routes through transparent glass and reflective interiors were included to examine differences between visible scene content and physical surface observations. The radar–depth support disagreement and depth-hole indicators have duration-weighted means of 12.2% and 2.5%, respectively, characterizing measurement consistency and availability.</p>
+            <p>Glare and low-feature observations provide challenging visual conditions, while height changes and rapid turns extend the motion patterns beyond level, straight-line traversal.</p>
+          </div>
+        </div>
+        <div class="frame fig fig--tall span-6 start-7"><img src="media/fig_dataset_character.png" width="868" height="1304" loading="lazy" alt="Eight panels of per-sequence indicators: radar-depth disagreement, depth holes, glare, low feature count, vertical motion, rapid turns, person presence and large person boxes" data-source="client" data-subject="paper figure: scene indicators"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="glass" aria-labelledby="glass-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <h2 class="span-5" id="glass-h">Radar and depth observations near a glass balustrade</h2>
+        <p class="span-6 start-7">The recorded on-board detections around the balustrade occupy the 3.3–4&nbsp;m range, while parts of the depth image are unsupported or describe farther visible structure. Across the valid projected samples, the median residual is −0.10&nbsp;m in two rooms and +1.09&nbsp;m in three corridors, with 26.6% and 6.8%, respectively, lying within ±0.2&nbsp;m.</p>
+      </div>
+      <div class="frame fig" style="margin-top: var(--s-7)"><img src="media/fig_surface_case.jpg" width="2560" height="676" loading="lazy" alt="An EE-1F scene near a glass balustrade with projected on-board radar detections, measured depth, and a radar-frame comparison of depth points, detections and raw-derived range-profile peaks" data-source="client" data-subject="paper figure: surface case" style="height:auto"></div>
+    </div>
+  </section>
+
+  <section class="section" id="benchmarks" style="--hm: 2" aria-labelledby="benchmarks-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-5">
+          <div class="section-head">
+            <h2 id="benchmarks-h">31 baseline configurations</h2>
+            <p>11 camera motion configurations, seven radar pipelines with two input representations each, and six image-based reconstruction configurations.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Benchmarks" style="margin-top: var(--s-5)">
+            <button class="tab" role="tab" type="button" id="tb-1" aria-selected="true" aria-controls="tab-1 screen-1">Camera and radar motion</button>
+            <button class="tab" role="tab" type="button" id="tb-2" aria-selected="false" aria-controls="tab-2 screen-2" tabindex="-1">Indoor conditions</button>
+            <button class="tab" role="tab" type="button" id="tb-3" aria-selected="false" aria-controls="tab-3 screen-3" tabindex="-1">Raw and on-board radar</button>
+            <button class="tab" role="tab" type="button" id="tb-4" aria-selected="false" aria-controls="tab-4 screen-4" tabindex="-1">3D reconstruction</button>
+          </div>
+          <div style="margin-top: var(--s-5); min-height: 190px">
+            <div role="tabpanel" id="tab-1" aria-labelledby="tb-1"><p>DROID-SLAM RGB-D achieves an aggregate one-second translation RPE of 0.04&nbsp;m and a mean rigid-aligned ATE of 4.06&nbsp;m. The difference between small local errors and larger route-scale discrepancies shows why both measures are needed for continuous indoor traversals.</p></div>
+            <div role="tabpanel" id="tab-2" aria-labelledby="tb-2" hidden><p>On EE-508, the displayed camera configurations achieve rigid-aligned ATEs of 0.22–0.41&nbsp;m, compared with 1.4&nbsp;m for the raw Doppler–IMU baseline. On EE-stair-C, the same radar–IMU baseline achieves 3.0&nbsp;m ATE with 0.99 coverage, compared with 9.11&nbsp;m for DROID-SLAM RGB-D and 15.50&nbsp;m for ORB-SLAM3 RGB-D.</p></div>
+            <div role="tabpanel" id="tab-3" aria-labelledby="tb-3" hidden><p>Across the 14-sequence summaries, raw input yields 0.13&nbsp;m aggregate one-second translation RPE, compared with 0.77&nbsp;m for on-board input. Raw forward-velocity correlations exceed the on-board correlations in each reported sequence summary.</p></div>
+            <div role="tabpanel" id="tab-4" aria-labelledby="tb-4" hidden><p>π³ achieves the highest reported mean refined F1 at 5&nbsp;cm of 0.33, while its median fitted scale is 4.95. MapAnything has a median recovered scale of 0.92 with a different geometry trade-off.</p></div>
+          </div>
+        </div>
+        <div class="frame fig span-6 start-7">
+          <img id="screen-1" src="media/fig_benchmark_summary.png" width="879" height="996" loading="lazy" alt="Mean rigid-aligned ATE and median one-second translation RPE for camera and radar configurations" data-source="client" data-subject="paper figure: benchmark summary">
+          <img id="screen-2" src="media/fig_camera_radar_cases.png" width="1734" height="1382" loading="lazy" alt="Camera and radar trajectories on EE-508 and EE-stair-C against the reference" data-source="client" data-subject="paper figure: camera and radar cases" hidden>
+          <img id="screen-3" src="media/fig_ego_velocity_bars_corr.png" width="842" height="923" loading="lazy" alt="Forward-velocity correlation with the reference for raw-derived and on-board input on fourteen sequences" data-source="client" data-subject="paper figure: ego-velocity correlation" hidden>
+          <img id="screen-4" src="media/fig_recon3d_bars_geometry.png" width="893" height="971" loading="lazy" alt="Mean post-ICP F1, median aligned camera-pose ATE and fitted scale for six reconstruction configurations" data-source="client" data-subject="paper figure: reconstruction summary" hidden>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="download" aria-labelledby="download-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-5">
+          <h2 id="download-h">Data availability</h2>
+          <p class="t-lead" style="margin-top: var(--s-5)">The paper is under double-blind review. The dataset and RIVET-tools will be released on Hugging Face after the review process.</p>
+          <div class="frame frame--photo photo photo--low" style="margin-top: var(--s-6)"><img class="frame__img" src="media/rig_back.jpg" width="800" height="1200" loading="lazy" alt="Back of the rig: the DCA1000 capture board with its Ethernet and power cables" data-source="client" data-subject="acquisition rig, back"></div>
+        </div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>Recorded streams</h3><p>The collection contains 54,715 raw radar frames, 82,741 color–depth frame pairs, 2.22 million inertial records, and 1.30 million on-board radar detections. Uncompressed ADC storage totals 86.1&nbsp;GB.</p></div>
+          <div class="faq__item"><h3>Ethical considerations</h3><p>The recordings contain indoor color images and incidental human presence. Illustrative scene images use person masking and blur to reduce identifiability. Before public release, the recordings will undergo a review of identifiable people, visible personal information, and location-sensitive content, with appropriate redaction of the distributed images.</p></div>
+          <div class="faq__item"><h3>Intended use</h3><p>The dataset and toolkit are intended for research on sensing and spatial perception.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">RIVET on Hugging Face after review</h2>
+        <p class="t-small muted">Anonymous authors. Under double-blind review.</p>
+      </div>
+      <a class="btn btn--primary btn--xl btn--wide" href="#download">Download the dataset<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>RIVET</a>
+          <p class="footer__lede">Radar, inertial, and visual observations with evaluation tools.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Dataset</h3><ul><li><a href="#sequences">Sequences</a></li><li><a href="#scenes">Scenes</a></li><li><a href="#platform">Platform</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Toolkit</h3><ul><li><a href="#toolkit">Sequence directory</a></li><li><a href="#contributions">Contributions</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Glass</h3><ul><li><a href="#glass">Surface observations</a></li><li><a href="#indicators">Scene indicators</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Benchmarks</h3><ul><li><a href="#benchmarks">Baselines</a></li><li><a href="#abstract">Abstract</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 RIVET</span>
+        <div class="socials"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+</body>
+</html>
