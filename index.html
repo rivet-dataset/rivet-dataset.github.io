@@ -73,8 +73,14 @@
     .app > .app__pane--list { display: none; }
     .app > .app__pane + .app__pane { border-top: 0; }
   }
-  .fig { background: #fff; display: grid; place-items: center; overflow: hidden; }
-  .fig > img { width: 100%; height: 100%; object-fit: contain; }
+  .fig { background: #fff; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; overflow: hidden; }
+  .fig > img { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+  .fig::before { display: none; }
+  .strip { display: flex; align-items: center; gap: var(--s-4); width: 100%; }
+  .strip > img { min-width: 0; width: 0; height: auto; }
+  @media (max-width: 639px) { .strip { flex-direction: column; } .strip > img { width: 100%; flex: none !important; } }
+  .fig--pair { grid-template: minmax(0, 1fr) / repeat(2, minmax(0, 1fr)); gap: var(--s-6); height: 400px; }
+  @media (max-width: 639px) { .fig--pair { grid-template: auto auto / minmax(0, 1fr); height: auto; } .fig--pair > img { height: auto; } }
   .fig--tall { height: 588px; }
   .wall { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; }
   .wall img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
@@ -83,7 +89,7 @@
   .tbl th { font-weight: 500; }
   .tbl .n { text-align: right; }
   .tbl tfoot td { font-weight: 500; }
-  #benchmarks .frame { height: 520px; }
+  #benchmarks .frame { height: 588px; }
   @media (max-width: 1023px) { .wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } .fig--tall { height: 480px; } }
   @media (max-width: 639px) { .viz__body { grid-template-columns: 1fr 1fr; } .viz__body div:last-child { display: none; } .tbl { font-size: 13px; } .tbl .opt { display: none; } #benchmarks .frame { height: 360px; } }
   .hero--centred .hero__lead { color: var(--ink); }
@@ -94,9 +100,7 @@
   @media (max-width: 359px) { .close--type .btn--xl { min-width: 0; white-space: normal; font-size: 16px; } .closing__links .grid > * { min-width: 0; } }
   @media (max-width: 639px) {
     #platform .photo { height: 780px; }
-    #abstract .fig > img { height: 500px; }
-    #sequences .fig--tall { height: 760px; }
-    #glass .fig > img { height: 300px !important; object-fit: cover; object-position: left center; }
+    #sequences .fig--tall { height: auto; }
   }
   @media (max-width: 359px) { .hero--centred .pill { white-space: normal; flex-wrap: wrap; justify-content: center; max-width: 100%; } }
 </style>
@@ -384,14 +388,15 @@
   <section class="section" id="indicators" aria-labelledby="indicators-h">
     <div class="wrap">
       <div class="grid grid--top">
-        <div class="span-6">
-          <h2 id="indicators-h">Sequence-level scene and motion indicators</h2>
-          <div class="stack-4 measure" style="margin-top: var(--s-5)">
+        <h2 class="span-5" id="indicators-h">Sequence-level scene and motion indicators</h2>
+        <div class="stack-4 span-6 start-7">
             <p>Routes through transparent glass and reflective interiors were included to examine differences between visible scene content and physical surface observations. The radar–depth support disagreement and depth-hole indicators have duration-weighted means of 12.2% and 2.5%, respectively, characterizing measurement consistency and availability.</p>
             <p>Glare and low-feature observations provide challenging visual conditions, while height changes and rapid turns extend the motion patterns beyond level, straight-line traversal.</p>
-          </div>
         </div>
-        <div class="frame fig fig--tall span-6 start-7"><img src="media/fig_dataset_character.png" width="868" height="1304" loading="lazy" alt="Eight panels of per-sequence indicators: radar-depth disagreement, depth holes, glare, low feature count, vertical motion, rapid turns, person presence and large person boxes" data-source="client" data-subject="paper figure: scene indicators"></div>
+      </div>
+      <div class="frame fig fig--pair" style="margin-top: var(--s-6)">
+        <img src="media/fig_dataset_character_a.png" width="868" height="604" loading="lazy" alt="Four panels of per-sequence indicators: radar-depth disagreement, depth holes, glare and low feature count" data-source="client" data-subject="paper figure: scene indicators, upper row">
+        <img src="media/fig_dataset_character_b.png" width="868" height="670" loading="lazy" alt="Four panels of per-sequence indicators: vertical motion, rapid turns, person presence and large person boxes" data-source="client" data-subject="paper figure: scene indicators, lower row">
       </div>
     </div>
   </section>
@@ -402,7 +407,7 @@
         <h2 class="span-5" id="glass-h">Radar and depth observations near a glass balustrade</h2>
         <p class="span-6 start-7">The recorded on-board detections around the balustrade occupy the 3.3–4&nbsp;m range, while parts of the depth image are unsupported or describe farther visible structure. Across the valid projected samples, the median residual is −0.10&nbsp;m in two rooms and +1.09&nbsp;m in three corridors, with 26.6% and 6.8%, respectively, lying within ±0.2&nbsp;m.</p>
       </div>
-      <div class="frame fig" style="margin-top: var(--s-7)"><img src="media/fig_surface_case.jpg" width="2560" height="676" loading="lazy" alt="An EE-1F scene near a glass balustrade with projected on-board radar detections, measured depth, and a radar-frame comparison of depth points, detections and raw-derived range-profile peaks" data-source="client" data-subject="paper figure: surface case" style="height:auto"></div>
+      <div class="frame fig" style="margin-top: var(--s-7)"><div class="strip"><img src="media/fig_surface_case_a.jpg" width="837" height="676" style="flex: 1.238 1 0" loading="lazy" alt="An EE-1F scene near a glass balustrade with projected on-board radar detections" data-source="client" data-subject="paper figure: surface case, panel a"><img src="media/fig_surface_case_b.jpg" width="929" height="676" style="flex: 1.374 1 0" loading="lazy" alt="Measured depth of the same scene on a 0 to 8 m scale" data-source="client" data-subject="paper figure: surface case, panel b"><img src="media/fig_surface_case_c.jpg" width="760" height="676" style="flex: 1.124 1 0" loading="lazy" alt="Radar-frame comparison of depth points, on-board detections and raw-derived range-profile peaks" data-source="client" data-subject="paper figure: surface case, panel c"></div></div>
     </div>
   </section>
 
@@ -442,7 +447,7 @@
       <div class="grid grid--top">
         <div class="span-5">
           <h2 id="download-h">Data availability</h2>
-          <p class="t-lead" style="margin-top: var(--s-5)">The paper is under double-blind review. The dataset and RIVET-tools will be released on Hugging Face after the review process.</p>
+          <p class="t-lead" style="margin-top: var(--s-5)">The paper is under double-blind review. The dataset and RIVET-tools will be released publicly on Hugging Face after the paper is accepted.</p>
           <div class="frame frame--photo photo photo--low" style="margin-top: var(--s-6)"><img class="frame__img" src="media/rig_back.jpg" width="800" height="1200" loading="lazy" alt="Back of the rig: the DCA1000 capture board with its Ethernet and power cables" data-source="client" data-subject="acquisition rig, back"></div>
         </div>
         <div class="faq span-6 start-7">
@@ -459,7 +464,7 @@
   <div class="wrap">
     <div class="closing__cta close--type">
       <div class="section-head">
-        <h2 id="close-h">RIVET on Hugging Face after review</h2>
+        <h2 id="close-h">RIVET on Hugging Face after acceptance</h2>
         <p class="t-small muted">Anonymous authors. Under double-blind review.</p>
       </div>
       <a class="btn btn--primary btn--xl btn--wide" href="#download">Download the dataset<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
